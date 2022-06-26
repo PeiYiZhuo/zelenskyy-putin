@@ -1,85 +1,47 @@
 ---
 layout: post
-title: "Comparing Zelenskyy and Putin Press Releases"
+title: "A Comparison Zelenskyy and Putin Press Releases"
 output: 
   md_document:
     variant: gfm
     preserve_yaml: True
 ---
 
-``` r
-library(countrycode)
-library(tidyverse)
-```
+# A Comparison of Zelenskyy and Putin Press Releases
 
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+Russia launched its full-scale invasion of Ukraine on February 24, 2022,
+turning a conflict that has marred the region since 2014 into the
+largest war on European soil since the defeat of Nazi Germany in 1945.
+(For more context, I recommend this [New York Times
+article](https://www.nytimes.com/article/russia-ukraine-nato-europe.html)
+and this [piece from the Council on Foreign
+Relations](https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine).)
+As the Ukrainian and Russian armed forces struggle to gain the upper
+hand on the battlefield, the two governments are also prosecuting an
+information war for the hearts and minds of the world.
 
-    ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
-    ## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
-    ## ✓ readr   2.1.2     ✓ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-``` r
-library(lubridate)
-```
-
-    ## 
-    ## Attaching package: 'lubridate'
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     date, intersect, setdiff, union
-
-``` r
-library(patchwork)
-library(tidytext)
-library(scales)
-```
-
-    ## 
-    ## Attaching package: 'scales'
-
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     discard
-
-    ## The following object is masked from 'package:readr':
-    ## 
-    ##     col_factor
-
-``` r
-library(here)
-```
-
-    ## here() starts at /Users/peiyizhuo/zelenskyy-putin
-
-## Analyzing Press Releases from Zelensky and Putin
-
-We obtained the data for this final analysis by scraping the news
+For a glimpse of how this parallel war of words and images is being
+waged, I decided to use the tools of data science to take a look at the
+English language press releases that the two countries have been
+producing. I obtained the data for this analysis by scraping the news
 sections of the English language websites of [the President of
 Ukraine](https://www.president.gov.ua/en/news/all) and [the
-Kremlin](http://en.kremlin.ru/events/president/news). The pieces we
+Kremlin](http://en.kremlin.ru/events/president/news). The 1033 pieces I
 scraped are dated from February 24, 2022, the day that Russia launched
-their latest assault on Ukraine, to April 27, 2022. Thus, these pieces
-encompass the announcements made by the two leaders over the initial two
-months of the conflict.
+their latest assault on Ukraine, to June 25, 2022. These pieces
+encompass the announcements made by the two leaders over the initial
+four months of the conflict.
 
-According to our analysis, which is modeled after [David Robinson’s
-analysis on Trump tweets](http://varianceexplained.org/r/trump-tweets/),
-Zelenskyy’s press releases demonstrate more concern about the war in
-Ukraine than do the press releases of the Kremlin. Moreover, in light of
-the results of our analysis of headlines, Zelenskyy’s heightened sense
-of alarm over the war relative to Putin appears to be reflected in
-Western media’s intense interest in the conflict.
+According to my analysis, which is modeled after [David Robinson’s
+analysis of Donald Trump’s
+tweets](http://varianceexplained.org/r/trump-tweets/), Zelenskyy’s press
+releases demonstrate more concern about the war in Ukraine than do the
+press releases of the Kremlin.
 
 ``` r
 # https://community.rstudio.com/t/error-message-bad-restore-file-magic-number-file-may-be-corrupted-no-data-loaded/48649
-zelensky <- read_rds(here("press_release_data", "zelensky.rds"))
-putin <- read_rds(here("press_release_data", "putin.rds"))
+load(here("press_release_data", "zelenskyy.RData"))
+load(here("press_release_data", "putin.RData"))
 ```
 
 ``` r
@@ -91,9 +53,9 @@ putin <- putin %>%
   ) %>%
   select(-c(location, summary))
 
-zelensky <- mutate(zelensky, origin = "zelensky") 
+zelenskyy <- mutate(zelenskyy, origin = "zelensky") 
 
-articles <- zelensky %>%
+articles <- zelenskyy %>%
   rbind(putin) %>%
   mutate(text = ifelse(headline != "", paste(headline, text), text)) 
 ```

@@ -7,15 +7,16 @@ library(here)
 
 bow("https://www.president.gov.ua/en/news")
 
-# Grabs links to articles published from 2/24/2022 to 4/27/2022
-# Article links are spread across 33 pages
+# Grabs links to articles published from 2/24/2022 to 6/25/2022
+start = "24-02-2022"
+end = "25-06-2022"
 links <- NULL
 i <- 1
 repeat {
   cat(glue("Getting page {i} links"), "\n")
   url <- glue(
     "https://www.president.gov.ua/en/news/all?",
-    "date-from=24-02-2022&date-to=27-04-2022&page={i}"
+    "date-from={start}&date-to={end}&page={i}"
   )
   pg_links <- url %>%
     read_html() %>%
@@ -52,10 +53,10 @@ for (i in seq_along(links)) {
 }
 
 # Convert into data frame
-zelensky <- article_list %>%
+zelenskyy <- article_list %>%
   tibble(article = .) %>%
   unnest_wider(article) %>%
   mutate(date = dmy_hm(date))
 
 dir.create(here("press_release_data"))
-saveRDS(zelensky, file = here("press_release_data", "zelensky.rds"))
+save(zelenskyy, file = here("press_release_data", "zelenskyy.RData"))
