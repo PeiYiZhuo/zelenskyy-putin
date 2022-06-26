@@ -23,9 +23,9 @@ library(here)
 
 ## Analyzing Press Releases from Zelensky and Putin
 
-We obtained the data for this final analysis by scraping the news sections of the English language websites of [\textcolor{blue}{\underline{the President of Ukraine}}](https://www.president.gov.ua/en/news/all) and [\textcolor{blue}{\underline{the Kremlin}}](http://en.kremlin.ru/events/president/news). The pieces we scraped are dated from February 24, 2022, the day that Russia launched their latest assault on Ukraine, to April 27, 2022. Thus, these pieces encompass the announcements made by the two leaders over the initial two months of the conflict.
+We obtained the data for this final analysis by scraping the news sections of the English language websites of [the President of Ukraine](https://www.president.gov.ua/en/news/all) and [the Kremlin](http://en.kremlin.ru/events/president/news). The pieces we scraped are dated from February 24, 2022, the day that Russia launched their latest assault on Ukraine, to April 27, 2022. Thus, these pieces encompass the announcements made by the two leaders over the initial two months of the conflict.
 
-According to our analysis, which is modeled after [\textcolor{blue}{\underline{David Robinson's analysis on Trump tweets}}](http://varianceexplained.org/r/trump-tweets/), Zelenskyy's press releases demonstrate more concern about the war in Ukraine than do the press releases of the Kremlin. Moreover, in light of the results of our analysis of headlines, Zelenskyy's heightened sense of alarm over the war relative to Putin appears to be reflected in Western media's intense interest in the conflict. 
+According to our analysis, which is modeled after [David Robinson's analysis on Trump tweets](http://varianceexplained.org/r/trump-tweets/), Zelenskyy's press releases demonstrate more concern about the war in Ukraine than do the press releases of the Kremlin. Moreover, in light of the results of our analysis of headlines, Zelenskyy's heightened sense of alarm over the war relative to Putin appears to be reflected in Western media's intense interest in the conflict. 
 
 ```{r load-data}
 # https://community.rstudio.com/t/error-message-bad-restore-file-magic-number-file-may-be-corrupted-no-data-loaded/48649
