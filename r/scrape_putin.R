@@ -7,7 +7,9 @@ library(here)
 
 bow("http://en.kremlin.ru/events/president/news")
 
-# Grabs links to articles published from 2/24/2022 to 4/27/2022
+# Grabs links to articles published from start to end
+start <- ymd("2022-02-24")
+end <- ymd("2022-06-25")
 links <- NULL
 i <- 1
 repeat {
@@ -29,8 +31,8 @@ repeat {
     html_elements("span>time[itemprop=datePublished]") %>%
     html_attr("datetime") %>%
     ymd()
-  links <- c(links, pg_links[dates < ymd("2022-04-28") & dates > ymd("2022-02-23")])
-  if (any(dates < ymd("2022-02-24"))) break
+  links <- c(links, pg_links[dates <= end & dates >= start])
+  if (any(dates < start)) break
   i <- i + 1
 }
 
@@ -85,4 +87,4 @@ putin <- article_list %>%
   mutate(date = mdy_hm(date))
 
 dir.create(here("press_release_data"))
-saveRDS(putin, file = here("press_release_data", "putin.rds"))
+save(putin, file = here("press_release_data", "putin.RData"))
