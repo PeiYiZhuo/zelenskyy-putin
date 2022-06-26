@@ -1,8 +1,10 @@
 ---
+layout: post
 title: "Comparing Zelenskyy and Putin Press Releases"
-author: "Pei Yi Zhuo"
-date: '2022-06-26'
-output: html_document
+output: 
+  md_document:
+    variant: gfm
+    preserve_yaml: True
 ---
 
 ```{r setup, include=FALSE}
