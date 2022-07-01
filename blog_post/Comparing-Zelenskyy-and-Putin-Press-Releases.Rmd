@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "A Comparison Zelenskyy and Putin Press Releases"
+title: "An Analysis of Zelenskyy and Putin Press Releases"
 output: 
   md_document:
     variant: gfm
@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r load-packages, include=FALSE}
 library(countrycode)
 library(tidyverse)
+library(tidyquant)
 library(lubridate)
 library(patchwork)
 library(tidytext)
@@ -21,21 +22,20 @@ library(scales)
 library(here)
 ```
 
-# A Comparison of Zelenskyy and Putin Press Releases 
+# An Analysis of Zelenskyy and Putin Press Releases 
 
-Russia launched its full-scale invasion of Ukraine on February 24, 2022, turning a conflict that has marred the region since 2014 into the largest war on European soil since the defeat of Nazi Germany in 1945. (For more context, I recommend this [New York Times article](https://www.nytimes.com/article/russia-ukraine-nato-europe.html) and this [piece from the Council on Foreign Relations](https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine).) As the Ukrainian and Russian armed forces struggle to gain the upper hand on the battlefield, the two governments are also prosecuting an information war for the hearts and minds of the world. 
+Russia launched its full-scale invasion of Ukraine on February 24, 2022, turning a simmering conflict that has marred the region since 2014 into the largest war on European soil since the defeat of Nazi Germany in 1945. (For more context, I recommend this [New York Times article](https://www.nytimes.com/article/russia-ukraine-nato-europe.html) and this [piece from the Council on Foreign Relations](https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine).) As the Ukrainian and Russian armed forces struggle against each other to gain the upper hand on the battlefield, the two governments are also prosecuting an information war for the hearts and minds of the world. 
 
-For a glimpse of how this parallel war of words and images is being waged, I decided to use the tools of data science to take a look at the English language press releases that the two countries have been producing. I obtained the data for this analysis by scraping the news sections of the English language websites of [the President of Ukraine](https://www.president.gov.ua/en/news/all) and [the Kremlin](http://en.kremlin.ru/events/president/news). The 1033 pieces I scraped are dated from February 24, 2022, the day that Russia launched their latest assault on Ukraine, to June 25, 2022. These pieces encompass the announcements made by the two leaders over the initial four months of the conflict.
+For a glimpse of how this parallel war of words and images is being waged, I decided to use the tools of data science to take a look at the English language press releases that the two countries have been producing prior to and after February 24. I obtained the data for this analysis by scraping the news sections of the English language websites of [the President of Ukraine](https://www.president.gov.ua/en/news/all) and [the Kremlin](http://en.kremlin.ru/events/president/news). The 1033 pieces I scraped are dated from October 24, 2021, four months prior to the invasion, to June 24, 2022, four months after the invasion.
 
-According to my analysis, which is modeled after [David Robinson's analysis of Donald Trump's tweets](http://varianceexplained.org/r/trump-tweets/), Zelenskyy's press releases demonstrate more concern about the war in Ukraine than do the press releases of the Kremlin.
+According to my analysis, which is modeled after [David Robinson's analysis of Donald Trump's tweets](http://varianceexplained.org/r/trump-tweets/), Zelenskyy's press releases demonstrate more concern about the war in Ukraine than do the press releases of the Kremlin. Since February 24, Zelenskyy has published press releases at a faster rate than Putin and expresses more negative emotions in his releases than his Russian counterpart (who euphemistically refers to the war as a "special military operation"). These differences signal perhaps the contrasting communication goals of the two wartime leaders. While Zelenskyy is attempting to raise the alarm as loudly as he can about the existential threat to his country, Putin is trying to downplay the conflict through both the volume and the content of his press releases.
 
-```{r load-data}
-# https://community.rstudio.com/t/error-message-bad-restore-file-magic-number-file-may-be-corrupted-no-data-loaded/48649
+```{r load-data, include=FALSE}
 load(here("press_release_data", "zelenskyy.RData"))
 load(here("press_release_data", "putin.RData"))
 ```
 
-```{r combine-data}
+```{r combine-data, include=FALSE}
 putin <- putin %>%
   mutate(
     # Combine press release summary with text
@@ -44,18 +44,16 @@ putin <- putin %>%
   ) %>%
   select(-c(location, summary))
 
-zelenskyy <- mutate(zelenskyy, origin = "zelensky") 
+zelenskyy <- mutate(zelenskyy, origin = "zelenskyy") 
 
 articles <- zelenskyy %>%
   rbind(putin) %>%
   mutate(text = ifelse(headline != "", paste(headline, text), text)) 
 ```
 
-### Press Release Volume Over Time
+## Press Release Volume Over Time
 
-After combining the two data sets corresponding to Zelenskyy press releases and Putin press releases, we made the plot below. Each observation in the combined data set is associated with a piece from either Zelenskyy's or Putin's website. 
-
-```{r releases-over-time}
+```{r releases-over-time, echo=FALSE}
 pieces_by_day <- articles %>%
   mutate(
     date = date(date),
@@ -65,20 +63,43 @@ pieces_by_day <- articles %>%
   count()
 
 pieces_by_day %>%
-  ggplot(aes(x = date, y = n)) +
-    geom_line(size = 0.4) +
+  ggplot(aes(x = date, y = n, color = origin)) +
+    geom_vline(xintercept = ymd("2022-02-24"), color = "red", linetype = "dashed") +
+    annotate(
+      "text", label = "Full-scale invasion begins",
+      x = ymd("2022-03-26"), y = 6, size = 3
+    ) +
+    geom_ma(n = 30) + # https://www.r-bloggers.com/2021/04/ggplot-with-moving-averages/
+    coord_x_date(xlim = c("2021-11-22", "2022-06-24")) +
     labs(
       x = "Date",
       y = "Pieces",
-      title = "Zelenskyy publishes more press releases on average than Putin"
+      title = "Zelenskyy published more press releases than Putin after full-scale invasion",
+      subtitle = "30-day moving average"
     ) +
-    geom_smooth(method = lm, formula = y ~ 1, se = FALSE, size = 0.4, linetype = "dashed", color = "red") +
-    facet_wrap(~ origin, nrow = 1) +
     guides(color = guide_legend("Government")) +
     theme_minimal()
 ```
 
-Zelenskyy's busiest day for press releases was Feburary 24, the day Russia invaded his country. Meanwhile, the busiest day for announcements from Putin was April 12, the day he visited a cosmodrome, an event that is unrelated to the war in Ukraine. This could be seen as an indication of the messaging priorities of the two leaders. While Zelenskyy is attempting to raise the alarm regarding the threat to his country, Putin is attempting to downplay the conflict through both the volume and the content of his press releases. 
+Zelenskyy and Putin produced a comparable number of press releases prior to February 24, 2022. However, their rates of output diverge significantly after the full-scale invasion of Ukraine by Russia began. During this time period, Zelenskyy published at a rate of around five per day while Putin looks to be a full piece behind Zelenskyy in terms of daily output. Moreover, this gap shows no sign of closing. 
+
+```{r include=FALSE}
+zelenskyy_pieces_by_day <- pieces_by_day %>%
+  filter(origin == "Zelenskyy") %>%
+  add_column(
+    rank = rank(-.$n, ties.method = "min")
+  ) %>%
+  arrange(rank) 
+
+putin_pieces_by_day <- pieces_by_day %>%
+  filter(origin == "Putin") %>%
+  add_column(
+    rank = rank(-.$n, ties.method = "min")
+  ) %>%
+  arrange(rank) 
+```
+
+Relatedly, February 24 is tied for Zelenskyy's fourth busiest day overall at 10 releases, but is tied for Putin's 23rd busiest day overall at six releases. In this particular case as in the general one above, Zelenskyy exhibits a more dramatic responsive to the onset of the full-scale invasion than Putin.
 
 ### Countries Mentioned in Press Releases
 
@@ -96,15 +117,15 @@ mentioned_countries <- articles %>%
   summarize(n = n() / length(unique(.$headline))) %>%
   do(head(arrange(., desc(n)), 10)) 
   
-zelensky_countries <- mentioned_countries %>%
-  filter(origin == "zelensky") %>%
+zelenskyy_countries <- mentioned_countries %>%
+  filter(origin == "zelenskyy") %>%
   pull(countries)
 
 putin_countries <- mentioned_countries %>%
   filter(origin == "putin") %>%
   pull(countries)
 
-top_countries <- zelensky_countries[zelensky_countries %in% putin_countries]
+top_countries <- zelenskyy_countries[zelenskyy_countries %in% putin_countries]
 
 mentioned_countries %>%
   mutate(origin = ifelse(origin == "putin", "Putin", "Zelenskyy")) %>%
