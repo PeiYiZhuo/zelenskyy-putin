@@ -7,9 +7,9 @@ library(here)
 
 bow("https://www.president.gov.ua/en/news")
 
-# Grabs links to articles published from 2/24/2022 to 6/25/2022
-start = "24-02-2022"
-end = "25-06-2022"
+# Grabs links to articles published from 10/24/2021 to 6/24/2022
+start = "24-10-2021"
+end = "24-06-2022"
 links <- NULL
 i <- 1
 repeat {

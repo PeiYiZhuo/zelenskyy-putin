@@ -8,8 +8,8 @@ library(here)
 bow("http://en.kremlin.ru/events/president/news")
 
 # Grabs links to articles published from start to end
-start <- ymd("2022-02-24")
-end <- ymd("2022-06-25")
+start <- ymd("2021-10-24")
+end <- ymd("2022-06-24")
 links <- NULL
 i <- 1
 repeat {
