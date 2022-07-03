@@ -16,7 +16,6 @@ library(countrycode)
 library(tidyverse)
 library(tidyquant)
 library(lubridate)
-library(patchwork)
 library(tidytext)
 library(scales)
 library(here)
@@ -29,6 +28,8 @@ Russia launched its full-scale invasion of Ukraine on February 24, 2022, turning
 For a glimpse of how this parallel war of words and images is being waged, I decided to use the tools of data science to take a look at the English language press releases that the two countries have been producing prior to and after February 24. I obtained the data for this analysis by scraping the news sections of the English language websites of [the President of Ukraine](https://www.president.gov.ua/en/news/all) and [the Kremlin](http://en.kremlin.ru/events/president/news). The 1033 pieces I scraped are dated from October 24, 2021, four months prior to the invasion, to June 24, 2022, four months after the invasion.
 
 According to my analysis, which is modeled after [David Robinson's analysis of Donald Trump's tweets](http://varianceexplained.org/r/trump-tweets/), Zelenskyy's press releases demonstrate more concern about the war in Ukraine than do the press releases of the Kremlin. Since February 24, Zelenskyy has published press releases at a faster rate than Putin and expresses more negative emotions in his releases than his Russian counterpart (who euphemistically refers to the war as a "special military operation"). These differences illustrate the contrasting communication goals of the two wartime leaders. While Zelenskyy is attempting to raise the alarm as loudly as he can about the existential threat to his country, Putin is trying to downplay the conflict through both the volume and the content of his press releases.
+
+
 
 ```{r load-data, include=FALSE}
 load(here("press_release_data", "zelenskyy.RData"))
@@ -50,7 +51,8 @@ articles <- zelenskyy %>%
   rbind(putin) %>%
   mutate(
     text = ifelse(headline != "", paste(headline, text), text),
-    origin = ifelse(origin == "putin", "Putin", "Zelenskyy")
+    origin = ifelse(origin == "putin", "Putin", "Zelenskyy"),
+    after = date >= ymd("2022-02-24")
   ) 
 ```
 
@@ -83,7 +85,7 @@ pieces_by_day %>%
 
 Zelenskyy and Putin produced a comparable number of press releases prior to February 24, 2022. However, their rates of output diverge significantly after the full-scale invasion of Ukraine by Russia began. During this time period, Zelenskyy published at a rate of around five per day while Putin looks to be a full piece behind Zelenskyy in terms of daily output. Moreover, this gap shows no sign of closing. 
 
-```{r include=FALSE}
+```{r date-ranking, include=FALSE}
 zelenskyy_pieces_by_day <- pieces_by_day %>%
   filter(origin == "Zelenskyy") %>%
   add_column(
@@ -99,64 +101,73 @@ putin_pieces_by_day <- pieces_by_day %>%
   arrange(rank) 
 ```
 
-Relatedly, February 24 is tied for Zelenskyy's fourth busiest day overall at 10 releases, but is tied for Putin's 23rd busiest day overall at six releases. In this particular case as in the general one above, Zelenskyy exhibits a more dramatic responsive to the onset of the full-scale invasion than Putin.
+Relatedly, February 24 is tied for Zelenskyy's fourth busiest day overall at 10 releases, but is tied for Putin's 23rd busiest day overall at six releases. In this particular case as in the general one above, Zelenskyy exhibits a more dramatic responsive to the onset of the full-scale invasion than Putin. In what other ways have they diverged since then?
 
-### The Use of "War" vs. "Special Military Operation"
+### Mentions of war, Ukraine, and Russia
 
-```{r word-data-set}
+```{r word-data-set, include=FALSE}
 words <- articles %>%
   unnest_tokens(word, text) %>%
   anti_join(stop_words, by = "word")
 ```
 
-A much-discussed aspect of Russian messaging about the conflict has been their refusal to describe it as a war, instead using the term "special military operation." By contrast, Zelenskyy does not seem to have an issue with using the word "war." The use of obfuscating language by Putin contributes additional evidence in support of the claim that he is minimizing the war.
-
-```{r war-use}
-war <- words %>%
-  group_by(origin) %>%
-  summarize(
-    mentions_per_article = sum(word == "war") / length(unique(headline))
-  ) %>%
-  ggplot(aes(x = mentions_per_article, y = origin)) +
-  geom_bar(stat = "identity") +
-  labs(
-    x = "",
-    y = "",
-    title = '"War"'
-  ) +
-  theme_minimal()
-
+```{r war-smo, fig.width=5, fig.height=1.5, echo=FALSE}
 smo <- articles %>%
   mutate(
     # https://github.com/rstudio/cheatsheets/blob/main/strings.pdf
     smo = str_count(text, "special military operation|Special military operation")
   ) %>%
+  filter(after == TRUE) %>%
   group_by(origin) %>%
-  summarize(
-    mentions_per_article = sum(smo) / n()
-  ) %>%
-  ggplot(aes(x = mentions_per_article, y = origin)) +
-  geom_bar(stat = "identity") +
-  labs(
-    x = "Mentions per piece",
-    y = "",
-    title = '"Special Military Operation"'
-  ) +
-  theme_minimal()
+  summarize(n = sum(smo)) %>%
+  mutate(word = "special military operation")
 
-war / smo
+words_by_period <- words %>%
+  filter(after == TRUE) %>%
+  group_by(origin) %>%
+  # Consider the number of mentions of 
+  # "special military operation" every 50 words
+  summarize(total = n() / 50) 
+
+smo <- left_join(smo, words_by_period, by = "origin")
+
+words %>%
+  filter(after == TRUE) %>%
+  group_by(origin, word) %>%
+  count() %>%
+  ungroup() %>%
+  add_count(origin, wt = n, name = "total") %>%
+  filter(word %in% c("war", "security")) %>%
+  rbind(smo) %>%
+  .[nrow(.):1, ] %>%
+  group_by(word) %>%
+  do(tidy(poisson.test(.$n, .$total, alternative = "two.sided"))) %>%
+  ggplot(aes(x = estimate, y = reorder(word, estimate))) +
+  geom_col() +
+  geom_errorbar(aes(xmin = conf.low, xmax = conf.high), 
+                width = 0.1, position = position_dodge(width = 0.9)) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "red") +
+  scale_x_continuous(breaks = 0:14) +
+  annotate(
+    "text", label = "Zelenskyy is just as likely as Putin to use this term.",
+    x = 3.5, y = 1.5, size = 3
+  ) +
+  labs(
+    x = "Times more likely that Zelenskyy uses term", y = "",
+    title = 'Zelenskyy is 11 times more likely than Putin to use the word "war"',
+    subtitle = "Press releases from Feb 24 to Jun 24"
+  ) +
+  theme_minimal() +
+  theme(panel.grid.minor = element_blank())
 ```
 
-After using `unnest_tokens` from the `tidytext` package to create a data set of words and eliminating stop words ("the", "and", "so", etc.) from the data set, we found that this verbal distinction between the two leaders is apparent in their press releases.  
+A notable aspect of Russian messaging about the conflict has been their refusal to describe it as a war, instead using the infamous term "special military operation." By contrast, Zelenskyy has no issue with characterizing the hostilities as a war. After using `unnest_tokens` from the `tidytext` package to create a data set of words and eliminating stop words ("the", "and", "so", etc.) from the data set, I found that this difference between the vocabularies of the two leaders is apparent in their press releases.
 
-### Mentions of Ukraine and Russia
-
-```{r}
+```{r ukraine-russia, fig.width=3, fig.height=3, echo=FALSE}
 words %>%
-  filter(word != "belarussian") %>%
   mutate(
-    after = date >= ymd("2022-02-24"),
     country = case_when(
+      str_detect(word, "belarussian") ~ NA_character_,
       str_detect(word, "ukraine|ukrainian") ~ "Ukraine",
       str_detect(word, "russia") ~ "Russia",
       TRUE ~ NA_character_
@@ -170,25 +181,26 @@ words %>%
   .[nrow(.):1, ] %>%
   group_by(origin, country) %>%
   do(tidy(poisson.test(.$n, .$total, alternative = "two.sided"))) %>%
-  mutate(across(c("estimate", starts_with("conf")), ~ . - 1)) %>%
-  ggplot(aes(x = origin, y = estimate, fill = country)) +
+  ggplot(aes(x = origin, estimate, y = estimate, fill = country)) +
   geom_col(position = "dodge") +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), 
                 width = 0.1, position = position_dodge(width = 0.9)) +
-  scale_y_continuous(labels = label_percent()) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  annotate("text", label = "No change after\nfull-scale invasion",
+           x = 2.62, y = 1, size = 3, hjust = 0) +
+  coord_cartesian(clip = "off", xlim = c(1, 2)) +
   labs(
-    x = "Government", y = "% Change Since Full-Scale Invasion",
+    x = "Government", y = "Times more likely country mentioned post-invasion",
     title = paste0(
       "Zelenskyy increased mentions of Russia far more than Putin", 
       "\nincreased mentions of Ukraine since full-scale invasion"
     )
   ) +
   guides(fill = guide_legend("Mentions of ...")) +
-  theme_minimal()
-  
+  theme_minimal() 
 ```
 
-The above plot displays the countries that are among the top 10 most-mentioned for both Zelenskyy and Putin. Zelenskyy mentions Russia the most with Ukraine coming in close behind. However, Putin does not return the favor. Instead of mentioning Ukraine the most, the Kremlin prefers to talk about itself, at a rate far ahead of references to its neighbor. This discrepancy points again to an attempt, on the part of Putin, to downplay the conflict. While Zelenskyy is hyper-focused on his enemy, Russia, Putin shows less interest in discussing Ukraine despite the fact that Russia is waging an active war in that country.  
+The above plot depicts, for Zelenskyy and Putin, changes in their likelihood of mentioning their own as well as their counterpart's country. After February 24, the Kremlin's press releases only slightly increased their likelihood of mentioning Ukraine despite the start of their full-scale invasion of the country. Meanwhile, the likelihood that Zelenskyy mentions Russia quadrupled after that date. (For both sides, however, the likelihood of mentioning their own country barely budged from where it was pre-invasion.) The extent of Zelenskyy's increase relative to Putin's reinforces the contrast between the communication strategies of the governments led by these two men. While the war has seemingly consumed Zelenskyy's communications, Putin's response has been far less dramatic. 
 
 ### Sentiment Analysis
 
@@ -260,6 +272,10 @@ words %>%
 ```
 
 Zelenskyy's press releases are 3 times more likely to use angry words than Putin's. Zelenskyy's outrage in contrast to Putin's blase attitude is indicative of each leader's willingness (or lack thereof in the case of Putin) to display alarm over the conflict. It makes sense that Zelenskyy, given the state of emergency into which his country has been plunged, would project negative sentiments in his communications. Such a strategy is more likely to alert international allies of the severity of Ukraine's plight. Putin, on the other hand, having initiated the conflict, probably wants to give the impression that the situation is under control and is therefore apt to downplay the events of these past two months.
+
+### Conclusion
+
+Putin's use of obfuscating language contributes additional evidence in favor of the claim that he is minimizing the war.
 
 Additional Sources:
 
