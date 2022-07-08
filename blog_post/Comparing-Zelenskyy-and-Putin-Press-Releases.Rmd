@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(countrycode)
 library(tidyverse)
 library(tidyquant)
+library(patchwork)
 library(lubridate)
 library(tidytext)
 library(scales)
@@ -208,74 +209,81 @@ The above plot depicts, for Zelenskyy and Putin, changes in their likelihood of 
 # https://www.tidytextmining.com/sentiment.html
 nrc <- get_sentiments("nrc")
 words <- words %>%
-  add_count(origin) %>%
+  add_count(origin, after) %>%
   left_join(nrc, by = "word") %>%
-  group_by(origin, sentiment, total = n) %>%
+  group_by(origin, after, sentiment, total = n) %>%
   count(name = "number") %>%
   filter(!is.na(sentiment)) 
 ```
 
-Using the data set of words created in the previous section, we were able to conduct a comparison of the sentiments found in the Zelenskyy and Putin press releases along the lines of the one that David Robinson conducted on iPhone and Android tweets from Donald Trump's Twitter timeline.
+Since the full-scale invasion of Ukraine, Zelenskyy's press releases have increased by a greater extent in both volume and mentions of the opposing side than statements from the Kremlin. Using the data set of words created in the previous section, I conducted a sentiment analysis using Poisson tests (along the same lines as the one that David Robinson performed on iPhone and Android tweets from Donald Trump's Twitter timeline) and found further evidence of a divergence between Putin and Zelenskyy since February 24.
 
-```{r sentiment-bar}
+```{r sentiment-poisson-1}
 words %>%
-  mutate(origin = ifelse(origin == "putin", "Putin", "Zelenskyy")) %>%
-  ggplot(
-    aes(
-      # https://stackoverflow.com/questions/5208679/order-bars-in-ggplot2-bar-graph
-      x = number / total, 
-      y = reorder(sentiment, number / total),
-      fill = origin,
-      color = sentiment %in% c("negative", "fear", "anger")
+    mutate(after = ifelse(after, "Post-Invasion", "Pre-Invasion")) %>%
+    group_by(origin, sentiment) %>%
+    # https://www.datasciencemadesimple.com/reverse-the-order-of-dataframe-row-wise-2/
+    .[nrow(.):1, ] %>%
+    do(tidy(poisson.test(.$number, .$total))) %>%
+    mutate(across(c(estimate, starts_with("conf")), ~ . - 1)) %>%
+    ggplot(aes(x = estimate, y = reorder(sentiment, estimate), color = origin)) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+    geom_point() +
+    geom_errorbar(aes(xmin = conf.low, xmax = conf.high), width = 0.1) +
+    scale_x_continuous(labels = label_percent()) +
+    # https://en.wikipedia.org/wiki/Flag_of_Ukraine
+    # https://en.wikipedia.org/wiki/Flag_of_Russia
+    scale_color_manual(values = c("#DA291C", "#0066cc")) +
+    labs(
+      x = "Change from pre-invasion to post-invasion",
+      y = "Sentiment",
+      title = paste0("Zelenskyy press releases experienced a more dramatic shift",
+                     "\nin sentiment (especially negative ones) following invasion")
+    ) +
+    guides(color = guide_legend("")) +
+    theme_minimal() +
+    theme(
+       # https://stackoverflow.com/questions/20609716/changing-format-of-some-axis-labels-in-ggplot2-according-to-condition
+      axis.text.y = element_text(face = c(rep("plain", 5), rep("bold", 5)))
     )
-  ) +
-  scale_color_manual(values = c("transparent", "black")) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(
-    x = "Proportion of words",
-    y = "Sentiment",
-    title = "Zelenskyy is more negative, fearful, and angry than Putin"
-  ) +
-  guides(
-    color = "none",
-    fill = guide_legend("Government")
-  ) +
-  theme_minimal() +
-  theme(
-    # https://stackoverflow.com/questions/20609716/changing-format-of-some-axis-labels-in-ggplot2-according-to-condition
-    axis.text.y = element_text(
-      face = c("plain", "plain", "plain", "bold", "plain", "plain", 
-               "bold", "bold", "plain", "plain", "plain")
-    )
-  )
 ```
 
-There are dramatic differences between Zelenskyy and Putin in terms of the proportions of their words that connote negative, fearful, and angry sentiments respectively. Zelenskyy is more likely to display all three of these sentiments. Results from Poisson tests (visualized below) confirm this finding as statistically significant.
+As can be seen above, post-invasion press releases from Zelenskyy are much more likely to use words that connote disgust (140% more likely), sadness (138% more likely), negativity (117% more likely), anger (113% more likely), and fear (107% more likely) than those from before the invasion. In contrast to these large shifts in tone, the sentiment of Putin's press releases have hardly budged since the start of the invasion. The largest change for Russian press releases is in their use of joyful words, which increased 10% post-invasion. However, this is exceed by a 44% increase on the Ukrainian side.
 
-```{r sentiment-poisson}
+To examine this same phenomenon from a different angle, let's compare how much Zelenskyy's and Putin's press releases differed prior to the invasion versus after. 
+
+```{r sentiment-poisson-2}
 words %>%
-  group_by(sentiment) %>%
-  # https://www.datasciencemadesimple.com/reverse-the-order-of-dataframe-row-wise-2/
-  .[nrow(.):1, ] %>%
-  do(tidy(poisson.test(.$number, .$total))) %>%
-  mutate(across(c(estimate, starts_with("conf")), ~ . - 1)) %>%
-  ggplot(aes(x = estimate, y = reorder(sentiment, estimate))) +
-  geom_point() +
-  geom_errorbar(aes(xmin = conf.low, xmax = conf.high)) +
-  scale_x_continuous(labels = label_percent()) +
-  labs(
-    x = "Change from Putin to Zelenskyy",
-    y = "Sentiment",
-    title = "Negative sentiments more likely for Zelenskyy than Putin"
-  ) +
-  theme_minimal()
+    mutate(after = ifelse(after, "Post-Invasion", "Pre-Invasion")) %>%
+    group_by(after, sentiment) %>%
+    # https://www.datasciencemadesimple.com/reverse-the-order-of-dataframe-row-wise-2/
+    .[nrow(.):1, ] %>%
+    do(tidy(poisson.test(.$number, .$total))) %>%
+    mutate(across(c(estimate, starts_with("conf")), ~ . - 1)) %>%
+    ggplot(aes(x = estimate, y = reorder(sentiment, estimate), color = after)) +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+    geom_point() +
+    geom_errorbar(aes(xmin = conf.low, xmax = conf.high), width = 0.1) +
+    scale_x_continuous(labels = label_percent()) +
+    labs(
+      x = "Change from Putin to Zelenskyy",
+      y = "Sentiment",
+      title = paste0("Zelenskyy press releases diverged in sentiment (especially",
+                     "\nanger) from Putin press releases following invasion")
+    ) +
+    guides(color = guide_legend("Time period")) +
+    theme_minimal() +
+    theme(
+       # https://stackoverflow.com/questions/20609716/changing-format-of-some-axis-labels-in-ggplot2-according-to-condition
+      axis.text.y = element_text(face = c(rep("plain", 9), "bold"))
+    )
 ```
 
-Zelenskyy's press releases are 3 times more likely to use angry words than Putin's. Zelenskyy's outrage in contrast to Putin's blase attitude is indicative of each leader's willingness (or lack thereof in the case of Putin) to display alarm over the conflict. It makes sense that Zelenskyy, given the state of emergency into which his country has been plunged, would project negative sentiments in his communications. Such a strategy is more likely to alert international allies of the severity of Ukraine's plight. Putin, on the other hand, having initiated the conflict, probably wants to give the impression that the situation is under control and is therefore apt to downplay the events of these past two months.
+As you had probably expected, Zelenskyy became much more likely to use negative words relative to Putin during the period after February 24. Prior to the full-scale invasion, neither leader expressed all five negative sentiments more than the other. Putin's press releases were more likely to use words associated with disgust, negativity, and sadness while Zelenskyy was more likely to use angry and fearful words. However, after the Russian invasion, Zelenskyy became much more likely to use words associated with every one of these sentiments. Of particular note is the extent, at nearly 3 times that of the Kremlin, to which press releases from Zelenskyy became more likely to use angry words.
 
 ### Conclusion
 
-Putin's use of obfuscating language contributes additional evidence in favor of the claim that he is minimizing the war.
+Putin's use of obfuscating language contributes additional evidence in favor of the claim that he is minimizing the war. Zelenskyy's press releases are 3 times more likely to use angry words than Putin's. Zelenskyy's outrage in contrast to Putin's blase attitude is indicative of each leader's willingness (or lack thereof in the case of Putin) to display alarm over the conflict. It makes sense that Zelenskyy, given the state of emergency into which his country has been plunged, would project negative sentiments in his communications. Such a strategy is more likely to alert international allies of the severity of Ukraine's plight. Putin, on the other hand, having initiated the conflict, probably wants to give the impression that the situation is under control and is therefore apt to downplay the events of these past two months.
 
 Additional Sources:
 
