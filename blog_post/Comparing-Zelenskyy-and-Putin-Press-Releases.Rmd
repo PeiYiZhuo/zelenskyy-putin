@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "An Analysis of Zelenskyy and Putin Press Releases"
+title: "An Alarmed Zelenskyy vs. a Nonchalant Putin: An Analysis of Ukrainian and Russian Press Releases"
 output: 
   md_document:
     variant: gfm
@@ -22,7 +22,7 @@ library(scales)
 library(here)
 ```
 
-# An Analysis of Zelenskyy and Putin Press Releases 
+# An Alarmed Zelenskyy vs. a Nonchalant Putin: An Analysis of Ukrainian and Russian Press Releases 
 
 Russia launched its full-scale invasion of Ukraine on February 24, 2022, turning a simmering conflict that has marred the region since 2014 into the largest war on European soil since the defeat of Nazi Germany in 1945. (For more context, I recommend this [New York Times article](https://www.nytimes.com/article/russia-ukraine-nato-europe.html) and this [piece from the Council on Foreign Relations](https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine).) As the Ukrainian and Russian armed forces struggle against each other to gain the upper hand on the battlefield, the two governments are also prosecuting an information war for the hearts and minds of the world. 
 
@@ -281,7 +281,7 @@ words %>%
 
 As you had probably expected, Zelenskyy became much more likely to use negative words relative to Putin during the period after February 24. Prior to the full-scale invasion, neither leader expressed all five negative sentiments more than the other. Putin's press releases were more likely to use words associated with disgust, negativity, and sadness while Zelenskyy was more likely to use angry and fearful words. However, after the Russian invasion, Zelenskyy became much more likely to use words associated with every one of these sentiments. Of particular note is the extent, at nearly 3 times that of the Kremlin, to which press releases from Zelenskyy became more likely to use angry words.
 
-### Conclusion
+### A Study of Contrasts in Wartime Messaging
 
 Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with the circumstances in which the two leaders find themselves. Putin intended for the conflict to be swift, but instead his military is engaged in a protracted war against a stubborn opponent. Possibly because he wants to give the impression that nothing is amiss despite the unraveling of his initial plans, the Russian leader opts for a messaging strategy that signals continuity and nonchalance. 
 
