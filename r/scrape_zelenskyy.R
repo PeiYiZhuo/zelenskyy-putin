@@ -40,6 +40,7 @@ get_info_from <- function(url) {
     text = html %>%
       html_elements(".article_content p") %>%
       html_text2() %>%
+      .[. != ""] %>% # Remove empty strings
       # https://stackoverflow.com/questions/9314328/how-to-collapse-a-list-of-characters-into-a-single-string-in-r
       paste(collapse = " ")
   )
@@ -60,3 +61,4 @@ zelenskyy <- article_list %>%
 
 dir.create(here("press_release_data"))
 save(zelenskyy, file = here("press_release_data", "zelenskyy.RData"))
+write_csv(zelenskyy, file = here("press_release_data", "zelenskyy.csv"))

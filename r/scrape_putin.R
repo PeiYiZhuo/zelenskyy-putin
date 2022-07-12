@@ -55,6 +55,7 @@ get_info_from <- function(url) {
     text = html %>%
       html_elements("div[itemprop]>p") %>%
       html_text2() %>%
+      .[. != ""] %>% # Remove empty strings
       paste(collapse = " ")
   )
 }
@@ -88,3 +89,4 @@ putin <- article_list %>%
 
 dir.create(here("press_release_data"))
 save(putin, file = here("press_release_data", "putin.RData"))
+write_csv(putin, file = here("press_release_data", "putin.csv"))
