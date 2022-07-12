@@ -168,6 +168,7 @@ words %>%
     subtitle = "Press releases from Feb 24 to Jun 24"
   ) +
   theme_minimal() +
+  # https://felixfan.github.io/ggplot2-remove-grid-background-margin/
   theme(panel.grid.minor = element_blank())
 ```
 
@@ -196,6 +197,7 @@ words %>%
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), 
                 width = 0.1, position = position_dodge(width = 0.9)) +
   geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  # https://intellipaat.com/community/16371/how-to-left-align-text-in-annotate-from-ggplot2#:~:text=1%20Answer&text=To%20left%2Dalign%20text%20in,and%201%20means%20right%2Djustified.
   annotate("text", label = "No change after\nfull-scale invasion",
            x = 2.62, y = 1, size = 3, hjust = 0) +
   coord_cartesian(clip = "off", xlim = c(1, 2)) +
@@ -296,9 +298,11 @@ Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with th
 
 On the opposing side, it makes sense that Zelenskyy, given the sudden state of emergency into which his country has been plunged, would double down on communicating negative sentiments. Proceeding with "business as usual" would seem odd and inappropriate for a leader whose nation has been so thoroughly breached by a stronger foreign military. Undoubtedly, Zelenskyy needs international support more so than Putin does, and passionate language is more likely to alert foreign countries to the severity of Ukraine's plight.
 
-Additional Sources:
+### Resources
 
-1. https://intro2r.com/r-markdown-anatomy.html
-2. https://bookdown.org/yihui/rmarkdown/markdown-syntax.html
-3. https://bookdown.org/yihui/rmarkdown-cookbook/font-color.html
-4. https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8640.2012.00460.x
+- [NRC lexicon](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8640.2012.00460.x)
+- [RMarkdown formatting tips](https://intro2r.com/r-markdown-anatomy.html)
+- [More RMarkdown formatting tips](https://bookdown.org/yihui/rmarkdown/markdown-syntax.html)
+- [Block quotes](https://commonmark.org/help/tutorial/05-blockquotes.html)
+- [Concealing code blocks](https://bookdown.org/yihui/rmarkdown-cookbook/hide-one.html)
+- [Right-justify text](https://stackoverflow.com/questions/35077507/how-to-right-align-and-justify-align-in-markdown#:~:text=Allow%20markdown%20tables%20to%20specify,to%20default%20to%20right%20alignment.)
