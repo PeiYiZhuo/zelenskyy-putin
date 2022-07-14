@@ -8,7 +8,9 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/67303576/rmarkdown-html-output-poor-resolution-in-different-browsers
+# https://yihui.org/knitr/options/#plots
+knitr::opts_chunk$set(dpi = 300)
 ```
 
 ```{r load-packages, include=FALSE}
@@ -21,21 +23,35 @@ library(scales)
 library(here)
 ```
 
-# An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases 
+# An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases
 
-Russia launched its full-scale invasion of Ukraine on February 24, 2022, turning a simmering conflict that had marred the region since 2014 into the largest war on European soil since the defeat of Nazi Germany. (For more context, I recommend this [New York Times article](https://www.nytimes.com/article/russia-ukraine-nato-europe.html) and this [piece from the Council on Foreign Relations](https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine).) As the Ukrainian and Russian armed forces struggle against each other to gain the upper hand on the battlefield, the two governments are also prosecuting an information war for the hearts and minds of the world. 
+<!--
+**Note:** *If you are interested in the data sets of press releases I scrapped from Zelenskyy's and Putin's websites, I posted them on Kaggle.*
+-->
+
+Russia launched its full-scale invasion of Ukraine on February 24, 2022, turning a simmering conflict that had marred the region since 2014 into the largest war on European soil since the defeat of Nazi Germany. (For more context, I recommend this [New York Times article](https://www.nytimes.com/article/russia-ukraine-nato-europe.html) and this [piece from the Council on Foreign Relations](https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine).) As the Ukrainian and Russian armed forces struggle against each other to gain the upper hand on the battlefield, the two governments are also prosecuting an information war for the hearts and minds of the world.
 
 For a glimpse of how this parallel war of words is being waged, I decided to use the tools of data science to take a look at the English language press releases that the two countries have been producing prior to and after February 24. I obtained the data for this analysis by scraping the news sections of the English language websites of [the President of Ukraine](https://www.president.gov.ua/en/news/all) and [the Kremlin](http://en.kremlin.ru/events/president/news). The 1797 pieces I scraped are dated from October 24, 2021, four months prior to the invasion, to June 24, 2022, four months after the invasion.
 
 <br>
 
->In the liberated areas of Ukraine, work continues to record and investigate war crimes committed by the Russian Federation. Almost every day new mass graves are found. Evidence is being gathered. Thousands and thousands of victims. Hundreds of cases of brutal torture. Human corpses are still found in manholes and basements. Tied up, mutilated bodies.
-<div style="text-align: right"> Volodymr Zelenskyy (April 12, 2022) <div>
+> In the liberated areas of Ukraine, work continues to record and investigate war crimes committed by the Russian Federation. Almost every day new mass graves are found. Evidence is being gathered. Thousands and thousands of victims. Hundreds of cases of brutal torture. Human corpses are still found in manholes and basements. Tied up, mutilated bodies.
+>
+> <div style="text-align: right">
+>
+> Volodymr Zelenskyy (April 12, 2022)
+>
+> <div>
 
 <br>
 
->The special military operation is proceeding as planned. Of course, I am closely monitoring the discussion in our society and abroad. We must not keep anything from the public or keep anything secret; we must provide objective information about this combat operation.
-<div style="text-align: right"> Vladimir Putin (April 12, 2022) <div>
+> The special military operation is proceeding as planned. Of course, I am closely monitoring the discussion in our society and abroad. We must not keep anything from the public or keep anything secret; we must provide objective information about this combat operation.
+>
+> <div style="text-align: right">
+>
+> Vladimir Putin (April 12, 2022)
+>
+> <div>
 
 <br>
 
@@ -71,18 +87,30 @@ articles <- zelenskyy %>%
 ```{r releases-over-time, echo=FALSE}
 pieces_by_day <- articles %>%
   mutate(date = date(date)) %>%
-  group_by(date, origin) %>%
-  count()
+  count(date, origin)
+
+start <- ymd("2021-10-24")
+end <- ymd("2022-06-24")
+diff <- end - start
+all_dates <- tibble(
+  date = start + rep(0:diff, each = 2),
+  origin = rep(c("Putin", "Zelenskyy"), diff + 1)
+)
+
+pieces_by_day <- all_dates %>%
+  left_join(pieces_by_day, by = c("date", "origin")) %>%
+  mutate(n = ifelse(is.na(n), 0, n))
 
 pieces_by_day %>%
   ggplot(aes(x = date, y = n, color = origin)) +
-    geom_vline(xintercept = ymd("2022-02-24"), color = "red", linetype = "dashed") +
+    geom_vline(xintercept = ymd("2022-02-24"), color = "black", linetype = "dashed") +
     annotate(
       "text", label = "Full-scale invasion begins",
-      x = ymd("2022-03-26"), y = 6, size = 3
+      x = ymd("2022-03-22"), y = 6, size = 3
     ) +
-    geom_ma(n = 30) + # https://www.r-bloggers.com/2021/04/ggplot-with-moving-averages/
+    geom_ma(n = 30, linetype = "solid") + # https://www.r-bloggers.com/2021/04/ggplot-with-moving-averages/
     coord_x_date(xlim = c("2021-11-22", "2022-06-24")) +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b %y") +
     labs(
       x = "Date",
       y = "Pieces",
@@ -90,10 +118,11 @@ pieces_by_day %>%
       subtitle = "30-day moving average"
     ) +
     guides(color = guide_legend("Government")) +
-    theme_minimal()
+    theme_minimal() +
+    theme(legend.position = "bottom")
 ```
 
-Zelenskyy and Putin produced a comparable number of press releases prior to February 24, 2022. However, their rates of output diverge significantly after the full-scale invasion of Ukraine by Russia began. During this time period, Zelenskyy published at a rate of around five per day while Putin looks to be a full piece behind Zelenskyy in terms of daily output. Moreover, this gap shows no sign of closing. 
+Initially, Putin produced more press releases than Zelenskyy, having been an entire piece ahead in terms of the 30-day moving average in late November. However, the two leaders reached parity just prior to the full-scale invasion. After which, their rates of output diverged significantly. By late June, Zelenskyy is publishing at a rate of around five per day while Putin looks to be two full pieces behind Zelenskyy at approximately 3 a day.
 
 ```{r date-ranking, include=FALSE}
 zelenskyy_pieces_by_day <- pieces_by_day %>%
@@ -111,7 +140,7 @@ putin_pieces_by_day <- pieces_by_day %>%
   arrange(rank) 
 ```
 
-Relatedly, February 24 is tied for Zelenskyy's fourth busiest day overall at 10 releases, but is tied for Putin's 23rd busiest day overall at six releases. In this particular case as in the general one above, Zelenskyy exhibits a more dramatic responsive to the onset of the full-scale invasion than Putin. In what other ways have they diverged since then?
+Relatedly, February 24, which marks the start of Russia's full-scale invasion, is tied for Zelenskyy's fourth busiest day overall at 10 pieces. On the other hand, it is tied for Putin's 23rd busiest day overall at six pieces. In this particular case as in the general one above, Zelenskyy exhibits a more dramatic responsive to the onset of the full-scale invasion than Putin. In what other ways have they diverged since then?
 
 ### Mentions of war, Ukraine, and Russia
 
@@ -212,7 +241,7 @@ words %>%
   theme_minimal() 
 ```
 
-The above plot depicts, for Zelenskyy and Putin, changes in their likelihood of mentioning their own as well as their counterpart's country. After February 24, the Kremlin's press releases only slightly increased their likelihood of mentioning Ukraine despite the start of their full-scale invasion of the country. Meanwhile, the likelihood that Zelenskyy mentions Russia quadrupled after that date. (For both sides, however, the likelihood of mentioning their own country barely budged from where it was pre-invasion.) The extent of Zelenskyy's increase relative to Putin's reinforces the contrast between the communication strategies of the governments led by these two men. While the war has seemingly consumed Zelenskyy's communications, Putin's response has been far less dramatic. 
+The above plot depicts, for Zelenskyy and Putin, changes in their likelihood of mentioning their own as well as their counterpart's country. After February 24, the Kremlin's press releases only slightly increased their likelihood of mentioning Ukraine despite the start of their full-scale invasion of the country. Meanwhile, the likelihood that Zelenskyy mentions Russia quadrupled after that date. (For both sides, however, the likelihood of mentioning their own country barely budged from where it was pre-invasion.) The extent of Zelenskyy's increase relative to Putin's reinforces the contrast between the communication strategies of the governments led by these two men. While the war has seemingly consumed Zelenskyy's communications, Putin's response has been far less dramatic.
 
 ### Sentiment Analysis
 
@@ -261,7 +290,7 @@ words %>%
 
 As can be seen above, post-invasion press releases from Zelenskyy are much more likely to use words that connote disgust (140% more likely), sadness (138% more likely), negativity (117% more likely), anger (113% more likely), and fear (107% more likely) than those from before the invasion. In contrast to these large shifts in tone, the sentiment of Putin's press releases have hardly budged since the start of the invasion. The largest change for Russian press releases is in their use of joyful words, which increased 10% post-invasion. However, this is exceed by a 44% increase on the Ukrainian side.
 
-To examine this same phenomenon from a different angle, let's compare how much Zelenskyy's and Putin's press releases differed prior to the invasion versus after. 
+To examine this same phenomenon from a different angle, let's compare how much Zelenskyy's and Putin's press releases differed prior to the invasion versus after.
 
 ```{r sentiment-poisson-2}
 words %>%
@@ -294,7 +323,7 @@ As you had probably expected, Zelenskyy became much more likely to use negative 
 
 ### A Study of Contrasts in Wartime Messaging
 
-Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with the circumstances in which the two leaders find themselves. Putin intended for the conflict to be swift, but instead his military is engaged in a protracted war against a stubborn opponent. Possibly because he wants to give the impression that nothing is amiss despite the unraveling of his initial plans, the Russian leader opts for a messaging strategy that signals continuity and nonchalance. 
+Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with the circumstances in which the two leaders find themselves. Putin intended for the conflict to be swift, but instead his military is engaged in a protracted war against a stubborn opponent. Possibly because he wants to give the impression that nothing is amiss despite the unraveling of his initial plans, the Russian leader opts for a messaging strategy that signals continuity and nonchalance.
 
 On the opposing side, it makes sense that Zelenskyy, given the sudden state of emergency into which his country has been plunged, would double down on communicating negative sentiments. Proceeding with "business as usual" would seem odd and inappropriate for a leader whose nation has been so thoroughly breached by a stronger foreign military. Undoubtedly, Zelenskyy needs international support more so than Putin does, and passionate language is more likely to alert foreign countries to the severity of Ukraine's plight.
 
@@ -302,9 +331,9 @@ Putin has been described by former Secretary of State Henry Kissinger as ["aloof
 
 ### Resources
 
-- [NRC lexicon](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8640.2012.00460.x)
-- [RMarkdown formatting tips](https://intro2r.com/r-markdown-anatomy.html)
-- [More RMarkdown formatting tips](https://bookdown.org/yihui/rmarkdown/markdown-syntax.html)
-- [Block quotes](https://commonmark.org/help/tutorial/05-blockquotes.html)
-- [Concealing code blocks](https://bookdown.org/yihui/rmarkdown-cookbook/hide-one.html)
-- [Right-justify text](https://stackoverflow.com/questions/35077507/how-to-right-align-and-justify-align-in-markdown#:~:text=Allow%20markdown%20tables%20to%20specify,to%20default%20to%20right%20alignment.)
+-   [NRC lexicon](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8640.2012.00460.x)
+-   [RMarkdown formatting tips](https://intro2r.com/r-markdown-anatomy.html)
+-   [More RMarkdown formatting tips](https://bookdown.org/yihui/rmarkdown/markdown-syntax.html)
+-   [Block quotes](https://commonmark.org/help/tutorial/05-blockquotes.html)
+-   [Concealing code blocks](https://bookdown.org/yihui/rmarkdown-cookbook/hide-one.html)
+-   [Right-justify text](https://stackoverflow.com/questions/35077507/how-to-right-align-and-justify-align-in-markdown#:~:text=Allow%20markdown%20tables%20to%20specify,to%20default%20to%20right%20alignment.)
