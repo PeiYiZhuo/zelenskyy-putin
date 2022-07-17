@@ -57,7 +57,10 @@ for (i in seq_along(links)) {
 zelenskyy <- article_list %>%
   tibble(article = .) %>%
   unnest_wider(article) %>%
-  mutate(date = dmy_hm(date))
+  mutate(
+    date = dmy_hm(date),
+    text = str_replace_all(text, "’",  "'")
+  )
 
 dir.create(here("press_release_data"))
 save(zelenskyy, file = here("press_release_data", "zelenskyy.RData"))

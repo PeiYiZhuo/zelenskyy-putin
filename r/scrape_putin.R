@@ -85,7 +85,10 @@ for (i in seq_along(links)) {
 putin <- article_list %>%
   tibble(article = .) %>%
   unnest_wider(article) %>%
-  mutate(date = mdy_hm(date))
+  mutate(
+    date = mdy_hm(date),
+    text = str_replace_all(text, "’",  "'")
+  )
 
 dir.create(here("press_release_data"))
 save(putin, file = here("press_release_data", "putin.RData"))
