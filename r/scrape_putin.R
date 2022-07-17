@@ -86,7 +86,10 @@ putin <- article_list %>%
   tibble(article = .) %>%
   unnest_wider(article) %>%
   mutate(
+    headline = str_replace_all(headline, "’",  "'"),
     date = mdy_hm(date),
+    location = str_replace_all(location, "’",  "'"),
+    summary = str_replace_all(summary, "’",  "'"),
     text = str_replace_all(text, "’",  "'")
   )
 

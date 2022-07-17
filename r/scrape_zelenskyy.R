@@ -58,6 +58,7 @@ zelenskyy <- article_list %>%
   tibble(article = .) %>%
   unnest_wider(article) %>%
   mutate(
+    headline = str_replace_all(headline, "’",  "'"),
     date = dmy_hm(date),
     text = str_replace_all(text, "’",  "'")
   )
