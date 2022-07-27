@@ -56,7 +56,15 @@ get_info_from <- function(url) {
       html_elements("div[itemprop]>p") %>%
       html_text2() %>%
       .[. != ""] %>% # Remove empty strings
-      paste(collapse = " ")
+      paste(collapse = " "),
+    bios = html %>%
+      html_elements("div[itemprop]>p>a>span") %>%
+      html_text2() %>%
+      paste(collapse = "|") %>%
+      str_replace_all("\\(", "\\\\(") %>%
+      str_replace_all("\\)", "\\\\)") %>%
+      paste0("\\s(", ., ")\\s?(?=[\\s[:punct:]])")
+      
   )
 }
 
@@ -90,8 +98,10 @@ putin <- article_list %>%
     date = mdy_hm(date),
     location = str_replace_all(location, "’",  "'"),
     summary = str_replace_all(summary, "’",  "'"),
+    text = str_replace_all(text, bios, ""),
     text = str_replace_all(text, "’",  "'")
-  )
+  ) %>%
+  select(-bios)
 
 dir.create(here("press_release_data"))
 save(putin, file = here("press_release_data", "putin.RData"))
