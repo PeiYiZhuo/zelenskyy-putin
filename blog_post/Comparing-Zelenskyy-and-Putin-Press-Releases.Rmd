@@ -26,6 +26,8 @@ library(here)
 
 # An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases
 
+![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/putin_zelenskyy.jpf)
+
 <!--
 **Note:** *If you are interested in the data sets of press releases I scrapped from Zelenskyy's and Putin's websites, I posted them on Kaggle. The scripts I used to do the scraping are available on my Github.*
 -->
@@ -171,7 +173,7 @@ trigrams <- trigrams %>%
   filter(token == "special military operation") 
 ```
 
-```{r war-smo, fig.asp=0.55, echo=FALSE}
+```{r war-smo, fig.asp=0.6, echo=FALSE}
 words %>%
   filter(after == TRUE) %>%
   count(origin, token) %>%
@@ -239,7 +241,7 @@ russia <- c("russians", "russia's", "russia", "russian", "helirussia",
             "ofthecriminalprocedurecodeoftherussianfederation")
 ```
 
-```{r ukraine-russia-2, fig.asp = 0.8, echo=FALSE}
+```{r ukraine-russia-2, fig.asp = 0.85, echo=FALSE}
 words %>%
   mutate(
     country = case_when(
