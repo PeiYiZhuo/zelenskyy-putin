@@ -40,6 +40,7 @@ repeat {
 get_info_from <- function(url) {
   html <- read_html(url)
   list(
+    link = url,
     headline = html %>%
       html_elements("h1.entry-title.p-name") %>%
       html_text2(),
