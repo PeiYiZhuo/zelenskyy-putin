@@ -17,7 +17,6 @@ knitr::opts_chunk$set(dpi = 300)
 ```{r load-packages, include=FALSE}
 library(tidyverse)
 library(tidyquant)
-library(patchwork)
 library(lubridate)
 library(tidytext)
 library(scales)
@@ -26,11 +25,13 @@ library(here)
 
 # An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases
 
-![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/putin_zelenskyy.jpf)
+<br>
 
-<!--
-**Note:** *If you are interested in the data sets of press releases I scrapped from Zelenskyy's and Putin's websites, I posted them on Kaggle. The scripts I used to do the scraping are available on my Github.*
--->
+![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/putin_zelenskyy.jpf)Russian leader [Vladimir Putin](http://en.kremlin.ru/events/president/news/68454/photos) on the right and his Ukrainian counterpart [Volodymyr Zelenskyy](https://www.president.gov.ua/en/news/promova-prezidenta-ukrayini-v-parlamenti-sloveniyi-76369) on the left
+
+<br>
+
+**Note:** *If you are interested in the datasets of press releases I scrapped from Zelenskyy's and Putin's websites, I posted them on [Kaggle](https://www.kaggle.com/datasets/peiyizhuo/zelenskyy-and-putin-press-releases?select=putin.csv). The scripts that I used to do the scraping are available on [Github](https://github.com/PeiYiZhuo/zelenskyy-putin/tree/main/r).*
 
 Russia launched its full-scale invasion of Ukraine on February 24, 2022, turning a simmering conflict that had marred the region since 2014 into the largest war on European soil since the defeat of Nazi Germany. (For more context, I recommend this [New York Times article](https://www.nytimes.com/article/russia-ukraine-nato-europe.html) and this [piece from the Council on Foreign Relations](https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine).) As the Ukrainian and Russian armed forces struggle against each other to gain the upper hand on the battlefield, the two governments are also prosecuting an information war for the hearts and minds of the world.
 
@@ -42,7 +43,7 @@ For a glimpse of how this parallel war of words is being waged, I decided to use
 >
 > <div style="text-align: right">
 >
-> Volodymr Zelenskyy (April 12, 2022)
+> Volodymyr Zelenskyy (April 12, 2022)
 >
 > <div>
 
@@ -58,7 +59,7 @@ For a glimpse of how this parallel war of words is being waged, I decided to use
 
 <br>
 
-According to my analysis, which is modeled after [David Robinson's analysis of Donald Trump's tweets](http://varianceexplained.org/r/trump-tweets/), Ukrainian President Volodymr Zelenskyy's press releases demonstrate more concern about the war in Ukraine than do the press releases of the Kremlin. Since February 24, Zelenskyy has published press releases at a faster rate than Russian President Vladimir Putin and expressed more negative emotions in his releases than his Russian counterpart (who euphemistically refers to the war as a "special military operation"). I believe these differences in both the volume and the content of press releases illustrate the contrasting communication goals of the two wartime leaders: while Zelenskyy is raising the alarm about an existential threat to his country, Putin is downplaying the conflict.
+According to my analysis, which is modeled after [David Robinson's analysis of Donald Trump's tweets](http://varianceexplained.org/r/trump-tweets/), Ukrainian President Volodymyr Zelenskyy's press releases demonstrate more concern about the war in Ukraine than do the press releases of the Kremlin. Since February 24, Zelenskyy has published press releases at a faster rate than Russian President Vladimir Putin and expressed more negative emotions in his releases than his Russian counterpart (who euphemistically refers to the war as a "special military operation"). I believe these differences in both the volume and the content of press releases illustrate the contrasting communication goals of the two wartime leaders: while Zelenskyy is raising the alarm about an existential threat to his country, Putin is downplaying the conflict.
 
 ```{r load-data, include=FALSE}
 load(here("press_release_data", "zelenskyy.RData"))
@@ -74,7 +75,10 @@ putin <- putin %>%
   ) %>%
   select(-c(location, summary))
 
-zelenskyy <- mutate(zelenskyy, origin = "Zelenskyy") 
+zelenskyy <- zelenskyy %>%
+  # Filter out piece with no headline and text
+  filter(headline != "" | text != "") %>% 
+  mutate(origin = "Zelenskyy") 
 
 articles <- zelenskyy %>%
   rbind(putin) %>%
@@ -113,7 +117,7 @@ pieces_by_day %>%
     ) +
     geom_ma(n = 30, linetype = "solid") + # https://www.r-bloggers.com/2021/04/ggplot-with-moving-averages/
     coord_x_date(xlim = c("2021-11-22", "2022-06-24")) +
-    scale_x_date(date_breaks = "1 month", date_labels = "%b %y") +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b '%y") +
     labs(
       x = "Date",
       y = "Pieces",
@@ -125,7 +129,7 @@ pieces_by_day %>%
     theme(legend.position = "bottom")
 ```
 
-Initially, Putin produced more press releases than Zelenskyy, having been an entire piece ahead in terms of the 30-day moving average in late November. However, the two leaders reached parity just prior to the full-scale invasion. After which, their rates of output diverged significantly. By late June, Zelenskyy is publishing at a rate of around five per day while Putin looks to be two full pieces behind Zelenskyy at approximately 3 a day.
+Initially, Putin produced more press releases than Zelenskyy, having been ahead by around one release in terms of the 30-day moving average in late November 2021. However, the two leaders reached parity just prior to the full-scale invasion. After which, their rates of output diverged significantly. By late June 2022, Zelenskyy is publishing at a rate of around five per day while Putin looks to be around two pieces behind Zelenskyy at approximately 3 a day.
 
 ```{r date-ranking, include=FALSE}
 zelenskyy_pieces_by_day <- pieces_by_day %>%
@@ -143,7 +147,7 @@ putin_pieces_by_day <- pieces_by_day %>%
   arrange(rank) 
 ```
 
-Relatedly, February 24, which marks the start of Russia's full-scale invasion, is tied for Zelenskyy's fourth busiest day overall at 10 pieces. On the other hand, it is tied for Putin's 23rd busiest day overall at six pieces. In this particular case as in the general one above, Zelenskyy exhibits a more dramatic responsive to the onset of the full-scale invasion than Putin. In what other ways have they diverged since then?
+Relatedly, February 24, which marks the start of Russia's full-scale invasion, is tied for Zelenskyy's fourth busiest day overall at 10 pieces. On the other hand, it is tied for Putin's 23rd busiest day overall at six pieces. In this particular case as in the general one above, Zelenskyy appears to exhibit a more dramatic responsive to the onset of the full-scale invasion than Putin.
 
 ## Mentions of "special military operation," "war," Ukraine, and Russia
 
@@ -191,20 +195,20 @@ words %>%
   geom_vline(xintercept = 1, linetype = "dashed", color = "red") +
   scale_x_continuous(breaks = 0:14) +
   annotate(
-    "text", label = "Zelenskyy is just as likely as Putin to use this term.",
+    "text", label = "Zelenskyy uses this term at around the same rate as Putin.",
     x = 4.8, y = 1.5, size = 3
   ) +
   labs(
     x = "Times more likely Zelenskyy is to use term", y = "",
-    title = 'Zelenskyy is 11 times more likely than Putin to use the word "war"',
-    subtitle = "Press releases from Feb 24 to Jun 24"
+    title = 'Zelenskyy is 11.5 times more likely than Putin to use the word "war"',
+    subtitle = "Press releases from 2/24/2022 to 6/24/2022"
   ) +
   theme_minimal() +
   # https://felixfan.github.io/ggplot2-remove-grid-background-margin/
   theme(panel.grid.minor = element_blank())
 ```
 
-After using the `unnest_tokens` function from the `tidytext` package to create a data set of words as well as a data set of trigrams (combinations of three words), I eliminated stop words ("the", "and", "so", etc.) from each data set. Next, I computed the rate at which each leader's press releases featured "war" and "special military operation" and used a Poisson test to conclude that indeed the differences between Zelenskyy and Putin are statistically significant. According to the plot above, Zelenskyy's press releases are 11 times more likely than Putin's to use "war." Meanwhile, the former's likelihood of featuring "special military operation" is less than 2% that of the latter.
+After using the `unnest_tokens` function from the `tidytext` package to create a dataset of words as well as a dataset of trigrams (combinations of three words), I eliminated stop words ("the", "and", "so", etc.) from each dataset. Next, I computed the rate at which each leader's press releases featured "war" and "special military operation" and used a Poisson test to conclude that indeed the differences between Zelenskyy and Putin are statistically significant. According to the plot above, Zelenskyy's press releases are around 11.5 times more likely than Putin's to use "war." Meanwhile, the former's likelihood of featuring "special military operation" is less than 2% that of the latter.
 
 ```{r ukraine-russia-1, include=FALSE}
 cat("Mentions of Ukraine:\n")
@@ -260,7 +264,7 @@ words %>%
   geom_col(position = "dodge") +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), 
                 width = 0.1, position = position_dodge(width = 0.9)) +
-  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "black") +
   # https://intellipaat.com/community/16371/how-to-left-align-text-in-annotate-from-ggplot2#:~:text=1%20Answer&text=To%20left%2Dalign%20text%20in,and%201%20means%20right%2Djustified.
   annotate("text", label = "No change after\nfull-scale invasion",
            x = 2.62, y = 1, size = 3, hjust = 0) +
@@ -276,24 +280,23 @@ words %>%
   theme_minimal() 
 ```
 
-The above plot depicts, for Zelenskyy and Putin, changes in their likelihood of mentioning their own as well as their counterpart's country (either a reference to Ukraine/Ukrainians or Russia/Russians). After February 24, the Kremlin's press releases increased their likelihood of mentioning Ukraine by around 18%. Meanwhile, the likelihood of Zelenskyy mentioning Russia quadrupled after that date. (For both sides, however, the likelihood of mentioning their own country slightly decreased from where it was pre-invasion.) The extent of Zelenskyy's increase relative to Putin's reinforces the contrast between their communication strategies: While the start of the invasion coincided with a transformation in Zelenskyy's messaging, Putin's change has been far less dramatic.
+The above plot depicts, for Zelenskyy and Putin, changes in their likelihood of mentioning their own as well as their counterpart's country (either a reference to Ukraine/Ukrainians or Russia/Russians). After February 24, 2022, the Kremlin's press releases increased their likelihood of mentioning Ukraine by around 18%. Meanwhile, the likelihood of Zelenskyy mentioning Russia quadrupled after that date. (For both sides, however, the likelihood of mentioning their own country slightly decreased from where it was pre-invasion.) The extent of Zelenskyy's increase relative to Putin's reinforces the contrast between their communication strategies: While the start of the invasion coincided with a transformation in Zelenskyy's messaging, Putin's change has been far less dramatic.
 
 ### Sentiment Analysis
 
-```{r add-sentiments}
+```{r add-sentiments, include=FALSE}
 # https://www.tidytextmining.com/sentiment.html
 nrc <- get_sentiments("nrc")
 words <- words %>%
-  add_count(origin, after) %>%
+  add_count(origin, after, name = "total") %>%
   left_join(nrc, by = c("token" = "word")) %>%
-  group_by(origin, after, sentiment, total = n) %>%
-  count(name = "number") %>%
+  count(origin, after, sentiment, total, name = "number") %>%
   filter(!is.na(sentiment)) 
 ```
 
-Since the full-scale invasion of Ukraine, Zelenskyy's press releases have increased by a greater extent in both volume and mentions of the opposing side than statements from the Kremlin. Using the data set of words created in the previous section, I conducted a sentiment analysis using Poisson tests (along the same lines as the one that David Robinson performed on iPhone and Android tweets from Donald Trump's Twitter timeline) and found further evidence of a divergence between Putin and Zelenskyy since February 24.
+Since the full-scale invasion of Ukraine, Zelenskyy's press releases have increased by a greater extent in both volume and mentions of the opposing side than statements from the Kremlin. Using the dataset of words created in the previous section, I conducted a sentiment analysis using Poisson tests (along the same lines as [the one that David Robinson](http://varianceexplained.org/r/trump-tweets/) performed on iPhone and Android tweets from Donald Trump's Twitter timeline) and found further evidence of a divergence between Putin and Zelenskyy after February 24, 2022.
 
-```{r sentiment-poisson-1}
+```{r sentiment-poisson-1, echo=FALSE, warning=FALSE}
 words %>%
     mutate(after = ifelse(after, "Post-Invasion", "Pre-Invasion")) %>%
     group_by(origin, sentiment) %>%
@@ -306,14 +309,11 @@ words %>%
     geom_point() +
     geom_errorbar(aes(xmin = conf.low, xmax = conf.high), width = 0.1) +
     scale_x_continuous(labels = label_percent()) +
-    # https://en.wikipedia.org/wiki/Flag_of_Ukraine
-    # https://en.wikipedia.org/wiki/Flag_of_Russia
-    scale_color_manual(values = c("#DA291C", "#0066cc")) +
     labs(
       x = "Change from pre-invasion to post-invasion",
       y = "Sentiment",
-      title = paste0("Zelenskyy press releases experienced a more dramatic shift",
-                     "\nin sentiment (especially negative ones) following invasion")
+      title = paste0("Zelenskyy press releases experienced a more dramatic",
+                     "\nshift in negative sentiments following full-scale invasion")
     ) +
     guides(color = guide_legend("")) +
     theme_minimal() +
@@ -323,11 +323,11 @@ words %>%
     )
 ```
 
-As can be seen above, post-invasion press releases from Zelenskyy are much more likely to use words that connote disgust (140% more likely), sadness (138% more likely), negativity (117% more likely), anger (113% more likely), and fear (107% more likely) than those from before the invasion. In contrast to these large shifts in tone, the sentiment of Putin's press releases have hardly budged since the start of the invasion. The largest change for Russian press releases is in their use of joyful words, which increased 10% post-invasion. However, this is exceed by a 44% increase on the Ukrainian side.
+As can be seen above, post-invasion press releases from Zelenskyy are much more likely to use words that connote disgust (140% more likely), sadness (138% more likely), negativity (118% more likely), anger (113% more likely), and fear (107% more likely) than those from before the invasion. By contrast, the sentiment of Putin's press releases have not changed by nearly as much since the start of the invasion. The largest change for Russian press releases is in their use of joyful words, which increased 11% post-invasion. However, this is exceeded by a 45% increase on the Ukrainian side. 
 
 To examine this same phenomenon from a different angle, let's compare how much Zelenskyy's and Putin's press releases differed prior to the invasion versus after.
 
-```{r sentiment-poisson-2}
+```{r sentiment-poisson-2, echo=FALSE, warning=FALSE}
 words %>%
     mutate(after = ifelse(after, "Post-Invasion", "Pre-Invasion")) %>%
     group_by(after, sentiment) %>%
@@ -344,7 +344,7 @@ words %>%
       x = "Change from Putin to Zelenskyy",
       y = "Sentiment",
       title = paste0("Zelenskyy press releases diverged in sentiment (especially",
-                     "\nanger) from Putin press releases following invasion")
+                     "\nanger) from Putin press releases following full-scale invasion")
     ) +
     guides(color = guide_legend("Time period")) +
     theme_minimal() +
@@ -354,15 +354,15 @@ words %>%
     )
 ```
 
-As you had probably expected, Zelenskyy became much more likely to use negative words relative to Putin during the period after February 24. Prior to the full-scale invasion, neither leader expressed all five negative sentiments more than the other. Putin's press releases were more likely to use words associated with disgust, negativity, and sadness while Zelenskyy was more likely to use angry and fearful words. However, after the Russian invasion, Zelenskyy became much more likely to use words associated with every one of these sentiments. Of particular note is the extent, at nearly 3 times that of the Kremlin, to which press releases from Zelenskyy became more likely to use angry words.
+As you had probably expected, Zelenskyy's press releases was much more likely to use negative words relative to Putin's during the period after February 24. Prior to the full-scale invasion, neither leader expressed all five negative sentiments more than the other. Putin's press releases were more likely to use words associated with disgust, negativity, and sadness while Zelenskyy's were more likely to use angry and fearful words. However, after the Russian invasion, Zelenskyy's pieces became much more likely to use words associated with every one of these sentiments. Of particular note is the extent, at nearly 3 times the rate of the Kremlin, to which press releases from Zelenskyy became more likely to use angry words.
 
 ### A Study of Contrasts in Wartime Messaging
 
-Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with the circumstances in which the two leaders find themselves. Putin intended for the conflict to be swift, but instead his military is engaged in a protracted war against a stubborn opponent. Possibly because he wants to give the impression that nothing is amiss despite the unraveling of his initial plans, the Russian leader opts for a messaging strategy that signals continuity and nonchalance.
+Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with the circumstances in which the two leaders find themselves. Putin intended for the conflict to be a swift one in which [his superior military easily defeats the Ukrainian defenders](https://www.vox.com/22954833/russia-ukraine-invasion-strategy-putin-kyiv), so the Russian leader opts for a messaging strategy that gives off an air of competence and nonchalance. On the opposing side, it makes sense that Zelenskyy, given the sudden state of emergency into which his country has been plunged, would double down on communicating negative sentiments. Undoubtedly, Zelenskyy needs international support more so than Putin does, and strong language is more likely to alert foreign countries to the severity of Ukraine's plight.
 
-On the opposing side, it makes sense that Zelenskyy, given the sudden state of emergency into which his country has been plunged, would double down on communicating negative sentiments. Proceeding with "business as usual" would seem odd and inappropriate for a leader whose nation has been so thoroughly breached by a stronger foreign military. Undoubtedly, Zelenskyy needs international support more so than Putin does, and passionate language is more likely to alert foreign countries to the severity of Ukraine's plight.
+Putin has been described by former Secretary of State Henry Kissinger as ["aloof."](https://podcasts.google.com/feed/aHR0cHM6Ly93d3cub21ueWNvbnRlbnQuY29tL2QvcGxheWxpc3QvZDgzZjUyZTQtMjQ1NS00N2Y0LTk4MmUtYWI3OTAxMjBiOTU0LzUxNTU5MDhmLWE1MTUtNGJiZi1hYTEzLWFiODYwMGNlYzk1NC9hZTUyMjRiMy05ZWJiLTQ1YzItYmI1Zi1hYjg2MDBjZWM5NTkvcG9kY2FzdC5yc3M/episode/MTQxZmVmNzAtMjU2ZC00NDMwLWFhMWItYWVjZTAxMDRhNDVi?sa=X&ved=0CAYQuIEEahcKEwjItpm8qPL4AhUAAAAAHQAAAAAQAQ) Meanwhile, Zelenskyy's defiance has been likened to that shown by [British Prime Minister Winston Churchill against Adolf Hitler](https://www.nytimes.com/2022/03/23/opinion/zelensky-churchill.html). Whereas Putin is cold and distant, Zelenskyy is fiery and passionate.
 
-Putin has been described by former Secretary of State Henry Kissinger as ["aloof."](https://podcasts.google.com/feed/aHR0cHM6Ly93d3cub21ueWNvbnRlbnQuY29tL2QvcGxheWxpc3QvZDgzZjUyZTQtMjQ1NS00N2Y0LTk4MmUtYWI3OTAxMjBiOTU0LzUxNTU5MDhmLWE1MTUtNGJiZi1hYTEzLWFiODYwMGNlYzk1NC9hZTUyMjRiMy05ZWJiLTQ1YzItYmI1Zi1hYjg2MDBjZWM5NTkvcG9kY2FzdC5yc3M/episode/MTQxZmVmNzAtMjU2ZC00NDMwLWFhMWItYWVjZTAxMDRhNDVi?sa=X&ved=0CAYQuIEEahcKEwjItpm8qPL4AhUAAAAAHQAAAAAQAQ) Meanwhile, Zelenskyy's defiance has been likened to that of [British Prime Minister Winston Churchill](https://www.nytimes.com/2022/03/23/opinion/zelensky-churchill.html). Whereas Putin is cold and distant, Zelenskyy is fiery and passionate.
+---
 
 ### Resources
 
@@ -373,3 +373,5 @@ Putin has been described by former Secretary of State Henry Kissinger as ["aloof
 -   [Concealing code blocks](https://bookdown.org/yihui/rmarkdown-cookbook/hide-one.html)
 -   [Right-justifying text](https://stackoverflow.com/questions/35077507/how-to-right-align-and-justify-align-in-markdown#:~:text=Allow%20markdown%20tables%20to%20specify,to%20default%20to%20right%20alignment.)
 -   [Figure aspect ratios](https://sebastiansauer.github.io/figure_sizing_knitr/)
+-   [Images in RMarkdown](https://www.earthdatascience.org/courses/earth-analytics/document-your-science/add-images-to-rmarkdown-report/)
+-   [Collage in Photoshop](https://digital-photography-school.com/make-photoshop-collage-9-steps/)
