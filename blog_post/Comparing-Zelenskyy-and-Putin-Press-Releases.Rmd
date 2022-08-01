@@ -196,7 +196,7 @@ words %>%
   scale_x_continuous(breaks = 0:14) +
   annotate(
     "text", label = "Zelenskyy uses this term at around the same rate as Putin.",
-    x = 4.8, y = 1.5, size = 3
+    x = 5.4, y = 1.65, size = 3
   ) +
   labs(
     x = "Times more likely Zelenskyy is to use term", y = "",
