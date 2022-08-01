@@ -325,7 +325,7 @@ words %>%
 
 As can be seen above, post-invasion press releases from Zelenskyy are much more likely to use words that connote disgust (140% more likely), sadness (138% more likely), negativity (118% more likely), anger (113% more likely), and fear (107% more likely) than those from before the invasion. By contrast, the sentiment of Putin's press releases have not changed by nearly as much since the start of the invasion. The largest change for Russian press releases is in their use of joyful words, which increased 11% post-invasion. However, this is exceeded by a 45% increase on the Ukrainian side. 
 
-To examine this same phenomenon from a different angle, let's compare how much Zelenskyy's and Putin's press releases differed prior to the invasion versus after.
+To examine this same phenomenon from a different angle, let us compare how much Zelenskyy's and Putin's press releases differed prior to the invasion versus after.
 
 ```{r sentiment-poisson-2, echo=FALSE, warning=FALSE}
 words %>%

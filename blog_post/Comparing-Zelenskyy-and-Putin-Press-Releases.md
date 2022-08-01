@@ -172,7 +172,7 @@ change for Russian press releases is in their use of joyful words, which
 increased 11% post-invasion. However, this is exceeded by a 45% increase
 on the Ukrainian side.
 
-To examine this same phenomenon from a different angle, let’s compare
+To examine this same phenomenon from a different angle, let us compare
 how much Zelenskyy’s and Putin’s press releases differed prior to the
 invasion versus after.
 
