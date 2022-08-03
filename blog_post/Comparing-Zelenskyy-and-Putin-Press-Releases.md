@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases"
+description: After scraping 1796 press releases from the websites of the Kremlin and the President of Ukraine using the R package rvest, I conducted an analysis using the R packages tidyquant and tidytext that identified dramatic differences between the press releases of Vladimir Putin and Volodymyr Zelenskyy following the start of Russia's full-scale invasion of Ukraine on February 24, 2022. Whereas Zelenskyy's press releases became more disgusted, sad, negative, angry, and fearful as well as more frequent after that date, Putin's press releases changed by a far lesser extent.
 output: 
   md_document:
     variant: gfm
@@ -9,22 +10,18 @@ output:
 
 # An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases
 
-<br>
-
-![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/putin_zelenskyy.jpf)Russian
-leader [Vladimir
-Putin](http://en.kremlin.ru/events/president/news/68454/photos) on the
-right and his Ukrainian counterpart [Volodymyr
-Zelenskyy](https://www.president.gov.ua/en/news/promova-prezidenta-ukrayini-v-parlamenti-sloveniyi-76369)
-on the left
-
-<br>
-
 **Note:** *If you are interested in the datasets of press releases I
 scrapped from Zelenskyy’s and Putin’s websites, I posted them on
 [Kaggle](https://www.kaggle.com/datasets/peiyizhuo/zelenskyy-and-putin-press-releases?select=putin.csv).
 The scripts that I used to do the scraping are available on
 [Github](https://github.com/PeiYiZhuo/zelenskyy-putin/tree/main/r).*
+
+![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/putin_zelenskyy.jpg)
+Russian leader [Vladimir
+Putin](http://en.kremlin.ru/events/president/news/68454/photos) (right)
+and his Ukrainian counterpart [Volodymyr
+Zelenskyy](https://www.president.gov.ua/en/news/promova-prezidenta-ukrayini-v-parlamenti-sloveniyi-76369)
+(left)
 
 Russia launched its full-scale invasion of Ukraine on February 24, 2022,
 turning a simmering conflict that had marred the region since 2014 into
@@ -43,11 +40,9 @@ language press releases that the two countries have been producing prior
 to and after February 24. I obtained the data for this analysis by
 scraping the news sections of the English language websites of [the
 President of Ukraine](https://www.president.gov.ua/en/news/all) and [the
-Kremlin](http://en.kremlin.ru/events/president/news). The 1797 pieces I
+Kremlin](http://en.kremlin.ru/events/president/news). The 1796 pieces I
 scraped are dated from October 24, 2021, four months prior to the
 invasion, to June 24, 2022, four months after the invasion.
-
-<br>
 
 > In the liberated areas of Ukraine, work continues to record and
 > investigate war crimes committed by the Russian Federation. Almost
@@ -75,8 +70,6 @@ invasion, to June 24, 2022, four months after the invasion.
 >
 > <div>
 
-<br>
-
 According to my analysis, which is modeled after [David Robinson’s
 analysis of Donald Trump’s
 tweets](http://varianceexplained.org/r/trump-tweets/), Ukrainian
@@ -91,24 +84,28 @@ releases illustrate the contrasting communication goals of the two
 wartime leaders: while Zelenskyy is raising the alarm about an
 existential threat to his country, Putin is downplaying the conflict.
 
+<br>
+
 ## Press Release Volume Over Time
 
 ![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/figure-gfm/releases-over-time-1.png)<!-- -->
 
 Initially, Putin produced more press releases than Zelenskyy, having
 been ahead by around one release in terms of the 30-day moving average
-in late November 2021. However, the two leaders reached parity just
-prior to the full-scale invasion. After which, their rates of output
-diverged significantly. By late June 2022, Zelenskyy is publishing at a
-rate of around five per day while Putin looks to be around two pieces
-behind Zelenskyy at approximately 3 a day.
+in late November 2021. However, the two leaders reached parity prior to
+the full-scale invasion. After which, their rates of output diverged
+significantly. By late June 2022, Zelenskyy is publishing at a rate of
+around five per day while Putin looks to be around two pieces behind
+Zelenskyy at approximately 3 a day.
 
 Relatedly, February 24, which marks the start of Russia’s full-scale
 invasion, is tied for Zelenskyy’s fourth busiest day overall at 10
 pieces. On the other hand, it is tied for Putin’s 23rd busiest day
 overall at six pieces. In this particular case as in the general one
-above, Zelenskyy appears to exhibit a more dramatic responsive to the
+above, Zelenskyy appears to exhibit a more dramatic response to the
 onset of the full-scale invasion than Putin.
+
+<br>
 
 ## Mentions of “special military operation,” “war,” Ukraine, and Russia
 
@@ -145,10 +142,12 @@ likelihood of Zelenskyy mentioning Russia quadrupled after that date.
 slightly decreased from where it was pre-invasion.) The extent of
 Zelenskyy’s increase relative to Putin’s reinforces the contrast between
 their communication strategies: While the start of the invasion
-coincided with a transformation in Zelenskyy’s messaging, Putin’s change
-has been far less dramatic.
+coincided with a transformation in Zelenskyy’s messaging, things have
+been far less dramatic for Putin’s press releases.
 
-### Sentiment Analysis
+<br>
+
+## Sentiment Analysis
 
 Since the full-scale invasion of Ukraine, Zelenskyy’s press releases
 have increased by a greater extent in both volume and mentions of the
@@ -170,7 +169,7 @@ invasion. By contrast, the sentiment of Putin’s press releases have not
 changed by nearly as much since the start of the invasion. The largest
 change for Russian press releases is in their use of joyful words, which
 increased 11% post-invasion. However, this is exceeded by a 45% increase
-on the Ukrainian side.
+on the Ukrainian side within the same category.
 
 To examine this same phenomenon from a different angle, let us compare
 how much Zelenskyy’s and Putin’s press releases differed prior to the
@@ -190,13 +189,15 @@ sentiments. Of particular note is the extent, at nearly 3 times the rate
 of the Kremlin, to which press releases from Zelenskyy became more
 likely to use angry words.
 
-### A Study of Contrasts in Wartime Messaging
+<br>
+
+## A Study of Contrasts in Wartime Messaging
 
 Zelenskyy’s outrage in contrast to Putin’s blasé attitude is consistent
 with the circumstances in which the two leaders find themselves. Putin
-intended for the conflict to be a swift one in which [his superior
-military easily defeats the Ukrainian
-defenders](https://www.vox.com/22954833/russia-ukraine-invasion-strategy-putin-kyiv),
+intended for the conflict to be a swift one in which [the Ukrainian
+defenders would buckle before his superior
+military](https://www.vox.com/22954833/russia-ukraine-invasion-strategy-putin-kyiv),
 so the Russian leader opts for a messaging strategy that gives off an
 air of competence and nonchalance. On the opposing side, it makes sense
 that Zelenskyy, given the sudden state of emergency into which his
@@ -210,11 +211,14 @@ Putin has been described by former Secretary of State Henry Kissinger as
 Meanwhile, Zelenskyy’s defiance has been likened to that shown by
 [British Prime Minister Winston Churchill against Adolf
 Hitler](https://www.nytimes.com/2022/03/23/opinion/zelensky-churchill.html).
-Whereas Putin is cold and distant, Zelenskyy is fiery and passionate.
+Indeed, as my analysis has shown, whereas Putin is cold and distant,
+Zelenskyy is fiery and passionate.
+
+<br>
 
 ------------------------------------------------------------------------
 
-### Resources
+## Resources
 
 -   [NRC
     lexicon](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8640.2012.00460.x)
@@ -232,5 +236,7 @@ Whereas Putin is cold and distant, Zelenskyy is fiery and passionate.
     ratios](https://sebastiansauer.github.io/figure_sizing_knitr/)
 -   [Images in
     RMarkdown](https://www.earthdatascience.org/courses/earth-analytics/document-your-science/add-images-to-rmarkdown-report/)
--   [Collage in
+-   [Collages in
     Photoshop](https://digital-photography-school.com/make-photoshop-collage-9-steps/)
+
+<br>
