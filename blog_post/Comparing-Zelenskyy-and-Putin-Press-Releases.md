@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases"
-description: After scraping 1796 press releases from the websites of the Kremlin and the President of Ukraine using the R package rvest, I conducted an analysis using the R packages tidyquant and tidytext that identified dramatic differences between the press releases of Vladimir Putin and Volodymyr Zelenskyy following the start of Russia's full-scale invasion of Ukraine on February 24, 2022. Whereas Zelenskyy's press releases became more disgusted, sad, negative, angry, and fearful as well as more frequent after that date, Putin's press releases changed by a far lesser extent.
+description: After building a dataset by scraping 1796 press releases from the websites of the Kremlin and the President of Ukraine using the R package rvest, I conducted an analysis using the R packages tidyquant and tidytext that identified large differences between the press releases of Vladimir Putin and Volodymyr Zelenskyy following the start of Russia's full-scale invasion of Ukraine on February 24, 2022. Whereas Zelenskyy's press releases became more disgusted, sad, negative, angry, and fearful as well as more frequent after that date, Putin's press releases changed by a far lesser extent.
 output: 
   md_document:
     variant: gfm
@@ -10,8 +10,8 @@ output:
 
 # An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases
 
-**Note:** *If you are interested in the datasets of press releases I
-scrapped from Zelenskyy’s and Putin’s websites, I posted them on
+**Note:** *If you are interested in the dataset of press releases I
+scrapped from Zelenskyy’s and Putin’s websites, I posted it on
 [Kaggle](https://www.kaggle.com/datasets/peiyizhuo/zelenskyy-and-putin-press-releases?select=putin.csv).
 The scripts that I used to do the scraping are available on
 [Github](https://github.com/PeiYiZhuo/zelenskyy-putin/tree/main/r).*
@@ -98,9 +98,9 @@ significantly. By late June 2022, Zelenskyy is publishing at a rate of
 around five per day while Putin looks to be around two pieces behind
 Zelenskyy at approximately 3 a day.
 
-Relatedly, February 24, which marks the start of Russia’s full-scale
-invasion, is tied for Zelenskyy’s fourth busiest day overall at 10
-pieces. On the other hand, it is tied for Putin’s 23rd busiest day
+Relatedly, February 24, 2022, which marks the start of Russia’s
+full-scale invasion, is tied for Zelenskyy’s fourth busiest day overall
+at 10 pieces. On the other hand, it is tied for Putin’s 23rd busiest day
 overall at six pieces. In this particular case as in the general one
 above, Zelenskyy appears to exhibit a more dramatic response to the
 onset of the full-scale invasion than Putin.
@@ -120,8 +120,8 @@ military operation” than it was for Putin’s to do so.
 ![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/figure-gfm/war-smo-1.png)<!-- -->
 
 After using the `unnest_tokens` function from the `tidytext` package to
-create a dataset of words as well as a dataset of trigrams (combinations
-of three words), I eliminated stop words (“the”, “and”, “so”, etc.) from
+create a table of words as well as a table of trigrams (combinations of
+three words), I eliminated stop words (“the”, “and”, “so”, etc.) from
 each dataset. Next, I computed the rate at which each leader’s press
 releases featured “war” and “special military operation” and used a
 Poisson test to conclude that indeed the differences between Zelenskyy
@@ -142,8 +142,8 @@ likelihood of Zelenskyy mentioning Russia quadrupled after that date.
 slightly decreased from where it was pre-invasion.) The extent of
 Zelenskyy’s increase relative to Putin’s reinforces the contrast between
 their communication strategies: While the start of the invasion
-coincided with a transformation in Zelenskyy’s messaging, things have
-been far less dramatic for Putin’s press releases.
+coincided with a transformation in Zelenskyy’s messaging, the situation
+was far less dramatic on Putin’s side.
 
 <br>
 
@@ -151,9 +151,9 @@ been far less dramatic for Putin’s press releases.
 
 Since the full-scale invasion of Ukraine, Zelenskyy’s press releases
 have increased by a greater extent in both volume and mentions of the
-opposing side than statements from the Kremlin. Using the dataset of
-words created in the previous section, I conducted a sentiment analysis
-using Poisson tests (along the same lines as [the one that David
+opposing side than statements from the Kremlin. Using the table of words
+created in the previous section, I conducted a sentiment analysis using
+Poisson tests (along the same lines as [the one that David
 Robinson](http://varianceexplained.org/r/trump-tweets/) performed on
 iPhone and Android tweets from Donald Trump’s Twitter timeline) and
 found further evidence of a divergence between Putin and Zelenskyy after
@@ -166,13 +166,13 @@ much more likely to use words that connote disgust (140% more likely),
 sadness (138% more likely), negativity (118% more likely), anger (113%
 more likely), and fear (107% more likely) than those from before the
 invasion. By contrast, the sentiment of Putin’s press releases have not
-changed by nearly as much since the start of the invasion. The largest
-change for Russian press releases is in their use of joyful words, which
-increased 11% post-invasion. However, this is exceeded by a 45% increase
-on the Ukrainian side within the same category.
+changed by nearly as much. The largest change for Russian press releases
+is in their use of joyful words, which increased 11% post-invasion.
+However, this is exceeded by a 45% increase on the Ukrainian side within
+the same sentiment.
 
-To examine this same phenomenon from a different angle, let us compare
-how much Zelenskyy’s and Putin’s press releases differed prior to the
+To examine this phenomenon from a different angle, let us compare how
+much Zelenskyy’s and Putin’s press releases differed prior to the
 invasion versus after.
 
 ![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/figure-gfm/sentiment-poisson-2-1.png)<!-- -->
@@ -196,15 +196,15 @@ likely to use angry words.
 Zelenskyy’s outrage in contrast to Putin’s blasé attitude is consistent
 with the circumstances in which the two leaders find themselves. Putin
 intended for the conflict to be a swift one in which [the Ukrainian
-defenders would buckle before his superior
+defenders buckle before his superior
 military](https://www.vox.com/22954833/russia-ukraine-invasion-strategy-putin-kyiv),
-so the Russian leader opts for a messaging strategy that gives off an
+so the Russian leader opted for a messaging strategy that gives off an
 air of competence and nonchalance. On the opposing side, it makes sense
 that Zelenskyy, given the sudden state of emergency into which his
 country has been plunged, would double down on communicating negative
 sentiments. Undoubtedly, Zelenskyy needs international support more so
-than Putin does, and strong language is more likely to alert foreign
-countries to the severity of Ukraine’s plight.
+than Putin does, and strong language is apt to alert foreign countries
+to the severity of Ukraine’s plight.
 
 Putin has been described by former Secretary of State Henry Kissinger as
 [“aloof.”](https://podcasts.google.com/feed/aHR0cHM6Ly93d3cub21ueWNvbnRlbnQuY29tL2QvcGxheWxpc3QvZDgzZjUyZTQtMjQ1NS00N2Y0LTk4MmUtYWI3OTAxMjBiOTU0LzUxNTU5MDhmLWE1MTUtNGJiZi1hYTEzLWFiODYwMGNlYzk1NC9hZTUyMjRiMy05ZWJiLTQ1YzItYmI1Zi1hYjg2MDBjZWM5NTkvcG9kY2FzdC5yc3M/episode/MTQxZmVmNzAtMjU2ZC00NDMwLWFhMWItYWVjZTAxMDRhNDVi?sa=X&ved=0CAYQuIEEahcKEwjItpm8qPL4AhUAAAAAHQAAAAAQAQ)
@@ -213,6 +213,14 @@ Meanwhile, Zelenskyy’s defiance has been likened to that shown by
 Hitler](https://www.nytimes.com/2022/03/23/opinion/zelensky-churchill.html).
 Indeed, as my analysis has shown, whereas Putin is cold and distant,
 Zelenskyy is fiery and passionate.
+
+<br>
+
+## Acknowledgements
+
+This project came out of the work I did for a group project in
+Statistical Science 323 at Duke University. The other members of my
+group were Rivca Chaver, Emma Runia, Emma Friesen, and Shine Wu.
 
 <br>
 
