@@ -222,6 +222,8 @@ This project came out of the work I did for a group project in
 Statistical Science 323 at Duke University. The other members of my
 group were Rivca Chaver, Emma Runia, Emma Friesen, and Shine Wu.
 
+<br>
+
 ## Note on Licenses
 
 The content of the websites of the President of Ukraine and the Kremlin
