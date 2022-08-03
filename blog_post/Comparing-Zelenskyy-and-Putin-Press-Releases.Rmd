@@ -204,7 +204,7 @@ words %>%
   theme(panel.grid.minor = element_blank())
 ```
 
-After using the `unnest_tokens` function from the `tidytext` package to create a table of words as well as a table of trigrams (combinations of three words), I eliminated stop words ("the", "and", "so", etc.) from each dataset. Next, I computed the rate at which each leader's press releases featured "war" and "special military operation" and used a Poisson test to conclude that indeed the differences between Zelenskyy and Putin are statistically significant. According to the plot above, Zelenskyy's press releases are around 11.5 times more likely than Putin's to use "war." Meanwhile, the former's likelihood of featuring "special military operation" is less than 2% that of the latter.
+After using the `unnest_tokens()` function from the tidytext package to create a table of words as well as a table of trigrams (combinations of three words), I eliminated stop words ("the", "and", "so", etc.) from each dataset. Next, I computed the rate at which each leader's press releases featured "war" and "special military operation" and used a Poisson test to conclude that indeed the differences between Zelenskyy and Putin are statistically significant. According to the plot above, Zelenskyy's press releases are around 11.5 times more likely than Putin's to use "war." Meanwhile, the former's likelihood of featuring "special military operation" is less than 2% that of the latter.
 
 ```{r ukraine-russia-1, include=FALSE}
 cat("Mentions of Ukraine:\n")

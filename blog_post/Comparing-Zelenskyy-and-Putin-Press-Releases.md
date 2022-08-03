@@ -119,7 +119,7 @@ military operation” than it was for Putin’s to do so.
 
 ![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/figure-gfm/war-smo-1.png)<!-- -->
 
-After using the `unnest_tokens` function from the `tidytext` package to
+After using the `unnest_tokens()` function from the tidytext package to
 create a table of words as well as a table of trigrams (combinations of
 three words), I eliminated stop words (“the”, “and”, “so”, etc.) from
 each dataset. Next, I computed the rate at which each leader’s press
