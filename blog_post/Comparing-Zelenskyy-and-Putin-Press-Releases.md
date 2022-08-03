@@ -222,6 +222,16 @@ This project came out of the work I did for a group project in
 Statistical Science 323 at Duke University. The other members of my
 group were Rivca Chaver, Emma Runia, Emma Friesen, and Shine Wu.
 
+## Note on Licenses
+
+The content of the websites of the President of Ukraine and the Kremlin
+are licensed under a [Creative Commons Attribution 4.0 International
+license](https://creativecommons.org/licenses/by/4.0/deed.en). The
+photos of
+[Putin](http://en.kremlin.ru/events/president/news/68454/photos) and
+[Zelenskyy](https://www.president.gov.ua/en/news/promova-prezidenta-ukrayini-v-parlamenti-sloveniyi-76369)
+in the collage above are taken from their respective websites.
+
 <br>
 
 ------------------------------------------------------------------------
