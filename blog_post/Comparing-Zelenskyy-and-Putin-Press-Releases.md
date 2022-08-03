@@ -12,7 +12,7 @@ output:
 
 **Note:** *If you are interested in the dataset of press releases I
 scrapped from Zelenskyy’s and Putin’s websites, I posted it on
-[Kaggle](https://www.kaggle.com/datasets/peiyizhuo/zelenskyy-and-putin-press-releases?select=putin.csv).
+[Kaggle](https://www.kaggle.com/datasets/peiyizhuo/zelenskyy-and-putin-press-releases).
 The scripts that I used to do the scraping are available on
 [Github](https://github.com/PeiYiZhuo/zelenskyy-putin/tree/main/r).*
 
@@ -162,7 +162,7 @@ February 24, 2022.
 ![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/figure-gfm/sentiment-poisson-1-1.png)<!-- -->
 
 As can be seen above, post-invasion press releases from Zelenskyy are
-much more likely to use words that connote disgust (140% more likely),
+much more likely to use words that connote disgust (141% more likely),
 sadness (138% more likely), negativity (118% more likely), anger (113%
 more likely), and fear (107% more likely) than those from before the
 invasion. By contrast, the sentiment of Putin’s press releases have not
@@ -199,9 +199,9 @@ intended for the conflict to be a swift one in which [the Ukrainian
 defenders buckle before his superior
 military](https://www.vox.com/22954833/russia-ukraine-invasion-strategy-putin-kyiv),
 so the Russian leader opted for a messaging strategy that gives off an
-air of competence and nonchalance. On the opposing side, it makes sense
-that Zelenskyy, given the sudden state of emergency into which his
-country has been plunged, would double down on communicating negative
+air of competence and nonchalance. On the opposing side, given the
+sudden state of emergency into which his country has been plunged, it
+makes sense that Zelenskyy would double down on communicating negative
 sentiments. Undoubtedly, Zelenskyy needs international support more so
 than Putin does, and strong language is apt to alert foreign countries
 to the severity of Ukraine’s plight.

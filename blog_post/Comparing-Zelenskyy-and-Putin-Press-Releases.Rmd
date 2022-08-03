@@ -26,7 +26,7 @@ library(here)
 
 # An Alarmed Zelenskyy vs. a Nonchalant Putin: Analyzing Ukrainian and Russian Press Releases
 
-**Note:** *If you are interested in the dataset of press releases I scrapped from Zelenskyy's and Putin's websites, I posted it on [Kaggle](https://www.kaggle.com/datasets/peiyizhuo/zelenskyy-and-putin-press-releases?select=putin.csv). The scripts that I used to do the scraping are available on [Github](https://github.com/PeiYiZhuo/zelenskyy-putin/tree/main/r).*
+**Note:** *If you are interested in the dataset of press releases I scrapped from Zelenskyy's and Putin's websites, I posted it on [Kaggle](https://www.kaggle.com/datasets/peiyizhuo/zelenskyy-and-putin-press-releases). The scripts that I used to do the scraping are available on [Github](https://github.com/PeiYiZhuo/zelenskyy-putin/tree/main/r).*
 
 ![](Comparing-Zelenskyy-and-Putin-Press-Releases_files/putin_zelenskyy.jpg)
 Russian leader [Vladimir Putin](http://en.kremlin.ru/events/president/news/68454/photos) (right) and his Ukrainian counterpart [Volodymyr Zelenskyy](https://www.president.gov.ua/en/news/promova-prezidenta-ukrayini-v-parlamenti-sloveniyi-76369) (left)
@@ -191,7 +191,7 @@ words %>%
   geom_vline(xintercept = 1, linetype = "dashed", color = "red") +
   scale_x_continuous(breaks = 0:14) +
   annotate(
-    "text", label = "Zelenskyy uses this term at around the same rate as Putin.",
+    "text", label = "Zelenskyy uses this term at roughly the same rate as Putin.",
     x = 5.4, y = 1.65, size = 3
   ) +
   labs(
@@ -321,7 +321,7 @@ words %>%
     )
 ```
 
-As can be seen above, post-invasion press releases from Zelenskyy are much more likely to use words that connote disgust (140% more likely), sadness (138% more likely), negativity (118% more likely), anger (113% more likely), and fear (107% more likely) than those from before the invasion. By contrast, the sentiment of Putin's press releases have not changed by nearly as much. The largest change for Russian press releases is in their use of joyful words, which increased 11% post-invasion. However, this is exceeded by a 45% increase on the Ukrainian side within the same sentiment.
+As can be seen above, post-invasion press releases from Zelenskyy are much more likely to use words that connote disgust (141% more likely), sadness (138% more likely), negativity (118% more likely), anger (113% more likely), and fear (107% more likely) than those from before the invasion. By contrast, the sentiment of Putin's press releases have not changed by nearly as much. The largest change for Russian press releases is in their use of joyful words, which increased 11% post-invasion. However, this is exceeded by a 45% increase on the Ukrainian side within the same sentiment.
 
 To examine this phenomenon from a different angle, let us compare how much Zelenskyy's and Putin's press releases differed prior to the invasion versus after.
 
@@ -358,7 +358,7 @@ As you had probably expected, Zelenskyy's press releases was much more likely to
 
 ## A Study of Contrasts in Wartime Messaging
 
-Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with the circumstances in which the two leaders find themselves. Putin intended for the conflict to be a swift one in which [the Ukrainian defenders buckle before his superior military](https://www.vox.com/22954833/russia-ukraine-invasion-strategy-putin-kyiv), so the Russian leader opted for a messaging strategy that gives off an air of competence and nonchalance. On the opposing side, it makes sense that Zelenskyy, given the sudden state of emergency into which his country has been plunged, would double down on communicating negative sentiments. Undoubtedly, Zelenskyy needs international support more so than Putin does, and strong language is apt to alert foreign countries to the severity of Ukraine's plight.
+Zelenskyy's outrage in contrast to Putin's blasé attitude is consistent with the circumstances in which the two leaders find themselves. Putin intended for the conflict to be a swift one in which [the Ukrainian defenders buckle before his superior military](https://www.vox.com/22954833/russia-ukraine-invasion-strategy-putin-kyiv), so the Russian leader opted for a messaging strategy that gives off an air of competence and nonchalance. On the opposing side, given the sudden state of emergency into which his country has been plunged, it makes sense that Zelenskyy would double down on communicating negative sentiments. Undoubtedly, Zelenskyy needs international support more so than Putin does, and strong language is apt to alert foreign countries to the severity of Ukraine's plight.
 
 Putin has been described by former Secretary of State Henry Kissinger as ["aloof."](https://podcasts.google.com/feed/aHR0cHM6Ly93d3cub21ueWNvbnRlbnQuY29tL2QvcGxheWxpc3QvZDgzZjUyZTQtMjQ1NS00N2Y0LTk4MmUtYWI3OTAxMjBiOTU0LzUxNTU5MDhmLWE1MTUtNGJiZi1hYTEzLWFiODYwMGNlYzk1NC9hZTUyMjRiMy05ZWJiLTQ1YzItYmI1Zi1hYjg2MDBjZWM5NTkvcG9kY2FzdC5yc3M/episode/MTQxZmVmNzAtMjU2ZC00NDMwLWFhMWItYWVjZTAxMDRhNDVi?sa=X&ved=0CAYQuIEEahcKEwjItpm8qPL4AhUAAAAAHQAAAAAQAQ) Meanwhile, Zelenskyy's defiance has been likened to that shown by [British Prime Minister Winston Churchill against Adolf Hitler](https://www.nytimes.com/2022/03/23/opinion/zelensky-churchill.html). Indeed, as my analysis has shown, whereas Putin is cold and distant, Zelenskyy is fiery and passionate.
 
