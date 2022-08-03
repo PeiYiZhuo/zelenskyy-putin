@@ -38,7 +38,7 @@ get_info_from <- function(url) {
     date = html %>%
       html_elements("h1+ .date") %>%
       html_text2(),
-    text = html %>%
+    body = html %>%
       html_elements(".article_content p") %>%
       html_text2() %>%
       .[. != ""] %>% # Remove empty strings
@@ -59,10 +59,18 @@ zelenskyy <- article_list %>%
   tibble(article = .) %>%
   unnest_wider(article) %>%
   mutate(
+    headline = str_replace_all(headline, "‘",  "'"),
     headline = str_replace_all(headline, "’",  "'"),
+    headline = str_replace_all(headline, "“",  "\""),
+    headline = str_replace_all(headline, "”",  "\""),
     date = dmy_hm(date),
-    text = str_replace_all(text, "’",  "'")
-  )
+    body = str_replace_all(body, "‘",  "'"),
+    body = str_replace_all(body, "’",  "'"),
+    body = str_replace_all(body, "“",  "\""),
+    body = str_replace_all(body, "”",  "\"")
+  ) %>%
+  # Filter out piece with no headline or body
+  filter(headline != "" | body != "")
 
 dir.create(here("press_release_data"))
 save(zelenskyy, file = here("press_release_data", "zelenskyy.RData"))

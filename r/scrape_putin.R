@@ -53,7 +53,7 @@ get_info_from <- function(url) {
     summary = html %>%
       html_elements("div[role=heading]") %>%
       html_text2(),
-    text = html %>%
+    body = html %>%
       html_elements("div[itemprop]>p") %>%
       html_text2() %>%
       .[. != ""] %>% # Remove empty strings
@@ -70,7 +70,7 @@ get_info_from <- function(url) {
 }
 
 # Scrape every article's webpage to produce list of lists
-article_list <- list()
+article_list <- rep(list(NA), length(links))
 for (i in seq_along(links)) {
   # https://stackoverflow.com/questions/32429325/r-redo-iteration-for-loop
   url <- glue("http://en.kremlin.ru", links[[i]])
@@ -80,7 +80,7 @@ for (i in seq_along(links)) {
     cat(glue("Trying link {i}"), "\n")
     article <- try(get_info_from(url))
     if (class(article) != "try-error") {
-      article_list[[length(article_list) + 1]] <- article
+      article_list[[i]] <- article
       break
     } else {
       cat("Sleeping for 10 seconds\n")
@@ -95,12 +95,24 @@ putin <- article_list %>%
   tibble(article = .) %>%
   unnest_wider(article) %>%
   mutate(
+    headline = str_replace_all(headline, "‘",  "'"),
     headline = str_replace_all(headline, "’",  "'"),
+    headline = str_replace_all(headline, "“",  "\""),
+    headline = str_replace_all(headline, "”",  "\""),
     date = mdy_hm(date),
+    location = str_replace_all(location, "‘",  "'"),
     location = str_replace_all(location, "’",  "'"),
+    location = str_replace_all(location, "“",  "\""),
+    location = str_replace_all(location, "”",  "\""),
+    summary = str_replace_all(summary, "‘",  "'"),
     summary = str_replace_all(summary, "’",  "'"),
-    text = str_replace_all(text, bios, ""),
-    text = str_replace_all(text, "’",  "'")
+    summary = str_replace_all(summary, "“",  "\""),
+    summary = str_replace_all(summary, "”",  "\""),
+    body = str_replace_all(body, bios, ""),
+    body = str_replace_all(body, "‘",  "'"),
+    body = str_replace_all(body, "’",  "'"),
+    body = str_replace_all(body, "“",  "\""),
+    body = str_replace_all(body, "”",  "\"")
   ) %>%
   select(-bios)
 
